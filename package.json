@@ -1,6 +1,6 @@
 {
   "name": "com.studioscor.movementsystem",
-  "version": "1.2.3",
+  "version": "0.0.1",
   "displayName": "MovementSystem",
-  "description": "This is an example package"
+  "description": "Movement System - StudioScor"
 }
