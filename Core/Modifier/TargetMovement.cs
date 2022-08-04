@@ -6,6 +6,10 @@ namespace KimScor.MovementSystem
 {
     public class TargetMovement : MovementModifier
     {
+        #region
+        public delegate void TargetMovementHandler(TargetMovement targetMovement);
+        #endregion
+
         [SerializeField] private float _Duration = 0.5f;
 
         [SerializeField] private bool UseMovementX = false;
@@ -29,17 +33,17 @@ namespace KimScor.MovementSystem
 
         [SerializeField] public bool isActivate { get; protected set; }
 
-        public UnityAction OnFinishMovement;
+        public event TargetMovementHandler OnFinishedMovement;
 
         private Quaternion _Direction;
 
         public TargetMovement()
         {
-            OnFinishMovement = null;
+            OnFinishedMovement = null;
             isActivate = false;
         }
 
-        public void SetValeu(FTargetMovement curveMove, float angle)
+        public void SetTargetMovement(FTargetMovement curveMove, float angle)
         {
             SetTargetMovement(curveMove);
             SetAngle(angle);
@@ -48,7 +52,7 @@ namespace KimScor.MovementSystem
         {
             if (isActivate)
             {
-                OnFinishMovement?.Invoke();
+                OnFinishedMovement?.Invoke(this);
             }
 
             _Duration = curveMove.Duration;
@@ -81,7 +85,7 @@ namespace KimScor.MovementSystem
         {
             if (isActivate)
             {
-                OnFinishMovement?.Invoke();
+                OnFinishedMovement?.Invoke(this);
 
                 isActivate = false;
             }
@@ -98,7 +102,7 @@ namespace KimScor.MovementSystem
             {
                 isActivate = false;
 
-                OnFinishMovement?.Invoke();
+                OnFinishedMovement?.Invoke(this);
 
                 return Vector3.zero;
             }
@@ -148,7 +152,7 @@ namespace KimScor.MovementSystem
             {
                 isActivate = false;
 
-                OnFinishMovement?.Invoke();
+                OnFinishedMovement?.Invoke(this);
 
                 return Vector3.zero;
             }

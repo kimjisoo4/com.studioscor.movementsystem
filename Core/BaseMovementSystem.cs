@@ -70,7 +70,7 @@ namespace KimScor.MovementSystem
 
         public void SetTargetMovement(FTargetMovement targetMovement, float angle)
         {
-            TargetMovement.SetValeu(targetMovement, angle);
+            TargetMovement.SetTargetMovement(targetMovement, angle);
         }
         public void SetTargetMovementAngle(float angle)
         {
