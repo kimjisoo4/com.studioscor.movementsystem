@@ -141,6 +141,10 @@ namespace KimScor.MovementSystem
             return moveVelocity;
         }
 
+        public override void ResetVelocity()
+        {
+            StopTargetMovement();
+        }
         public override Vector3 OnMovement(float deltaTime)
         {
             if (!isActivate)
@@ -196,5 +200,7 @@ namespace KimScor.MovementSystem
 
             return moveVelocity;
         }
+
+        
     }
 }

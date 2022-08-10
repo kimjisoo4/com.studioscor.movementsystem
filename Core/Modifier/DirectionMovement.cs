@@ -18,7 +18,7 @@ namespace KimScor.MovementSystem
         {
             _CurrentSpeed = newCurrentSpeed;
         }
-        public void ResetCurrentSpeed()
+        public override void ResetVelocity()
         {
             _CurrentSpeed = 0f;
         }

@@ -58,6 +58,10 @@ namespace KimScor.MovementSystem
         public void SetUseMovement(bool useDirection)
         {
             _UseMovement = useDirection;
+
+            if (!UseMovement)
+                DirectionMovement.ResetVelocity();
+                ForwardMovement.ResetVelocity();
         }
         public void SetUseSideStep(bool useSideStep)
         {
@@ -66,6 +70,9 @@ namespace KimScor.MovementSystem
         public void SetUseGravity(bool useGraity)
         {
             _UseGravity = useGraity;
+
+            if(!UseGravity)
+                GravityMovement.ResetVelocity();
         }
 
         public void SetTargetMovement(FTargetMovement targetMovement, float angle)

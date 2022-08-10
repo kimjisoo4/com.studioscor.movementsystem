@@ -10,6 +10,10 @@ namespace KimScor.MovementSystem
         public abstract float CurrentVeritcalSpeed { get; }
         public abstract float Gravity { get; }
 
+        public override void ResetVelocity()
+        {
+            
+        }
         public override Vector3 OnMovement(float deltaTime)
         {
             if (IsGrounded)
