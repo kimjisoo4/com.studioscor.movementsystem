@@ -138,6 +138,8 @@ namespace KimScor.MovementSystem
                 _PrevDistanceZ = distance;
             }
 
+            moveVelocity = _Direction * moveVelocity;
+
             return moveVelocity;
         }
 
