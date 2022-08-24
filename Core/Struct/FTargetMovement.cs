@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
+
 namespace KimScor.MovementSystem
 {
     [System.Serializable]
@@ -10,17 +14,35 @@ namespace KimScor.MovementSystem
 
         [Header("[ Setting ]")]
         public bool UseMovementX;
+#if ODIN_INSPECTOR
+        [ShowIf("UseMovementX")]
+#endif
         public float DistanceX;
+#if ODIN_INSPECTOR
+        [ShowIf("UseMovementX")]
+#endif
         public AnimationCurve CurveX;
 
         [Space(5)]
         public bool UseMovementY;
+#if ODIN_INSPECTOR
+        [ShowIf("UseMovementY")]
+#endif
         public float DistanceY;
+#if ODIN_INSPECTOR
+        [ShowIf("UseMovementY")]
+#endif
         public AnimationCurve CurveY;
 
         [Space(5)]
         public bool UseMovementZ;
+#if ODIN_INSPECTOR
+        [ShowIf("UseMovementZ")]
+#endif
         public float DistanceZ;
+#if ODIN_INSPECTOR
+        [ShowIf("UseMovementZ")]
+#endif
         public AnimationCurve CurveZ;
 
         public FTargetMovement(float duration,

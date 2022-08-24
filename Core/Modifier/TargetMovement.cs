@@ -24,14 +24,22 @@ namespace KimScor.MovementSystem
         [SerializeField] private float _DistanceZ = 5.0f;
         [SerializeField] private AnimationCurve _CurveZ = AnimationCurve.Linear(0, 0, 1, 1);
 
-        [SerializeField] private float _CurrentDuration = 0.0f;
+        [SerializeField] private float _ElapsedTime = 0.0f;
         [SerializeField, Range(0f, 1f)] private float _NormalizedTime = 0.0f;
 
         [SerializeField] private float _PrevDistanceX = 0f;
         [SerializeField] private float _PrevDistanceY = 0f;
         [SerializeField] private float _PrevDistanceZ = 0f;
 
-        [SerializeField] public bool isActivate { get; protected set; }
+        private bool _IsActivate;
+        private bool _IsFinished;
+        public bool IsActivate => _IsActivate;
+        public bool IsFinished => _IsFinished;
+
+        public float Duration => _Duration;
+        public float ElapsedTime => _ElapsedTime;
+        public float NormalizedTime => _NormalizedTime;
+ 
 
         public event TargetMovementHandler OnFinishedMovement;
 
@@ -40,7 +48,8 @@ namespace KimScor.MovementSystem
         public TargetMovement()
         {
             OnFinishedMovement = null;
-            isActivate = false;
+            _IsActivate = false;
+            _IsFinished = false;
         }
 
         public void SetTargetMovement(FTargetMovement curveMove, float angle)
@@ -50,7 +59,7 @@ namespace KimScor.MovementSystem
         }
         public void SetTargetMovement(FTargetMovement curveMove)
         {
-            if (isActivate)
+            if (IsActivate)
             {
                 OnFinishedMovement?.Invoke(this);
             }
@@ -70,10 +79,11 @@ namespace KimScor.MovementSystem
             _PrevDistanceY = 0f;
             _PrevDistanceZ = 0f;
 
-            _CurrentDuration = 0.0f;
+            _ElapsedTime = 0.0f;
             _NormalizedTime = 0.0f;
 
-            isActivate = true;
+            _IsActivate = true;
+            _IsFinished = false;
         }
 
         public void SetAngle(float angle)
@@ -83,24 +93,26 @@ namespace KimScor.MovementSystem
 
         public void StopTargetMovement()
         {
-            if (isActivate)
+            if (IsActivate)
             {
                 OnFinishedMovement?.Invoke(this);
 
-                isActivate = false;
+                _IsActivate = false;
+                _IsFinished = true;
             }
         }
 
         public Vector3 OnNormalizedMovement(float normalizedTime)
         {
-            if (!isActivate)
+            if (!IsActivate)
             {
                 return Vector3.zero;
             }
 
             if (normalizedTime >= 1.0f)
             {
-                isActivate = false;
+                _IsActivate = false;
+                _IsFinished = true;
 
                 OnFinishedMovement?.Invoke(this);
 
@@ -149,23 +161,24 @@ namespace KimScor.MovementSystem
         }
         public override Vector3 OnMovement(float deltaTime)
         {
-            if (!isActivate)
+            if (!IsActivate)
             {
                 return Vector3.zero;
             }
 
             if (_NormalizedTime >= 1.0f)
             {
-                isActivate = false;
+                _IsActivate = false;
+                _IsFinished = true;
 
                 OnFinishedMovement?.Invoke(this);
 
                 return Vector3.zero;
             }
 
-            _CurrentDuration += deltaTime;
+            _ElapsedTime += deltaTime;
 
-            _NormalizedTime = Mathf.Clamp01(_CurrentDuration / _Duration);
+            _NormalizedTime = Mathf.Clamp01(_ElapsedTime / _Duration);
 
             Vector3 moveVelocity = Vector3.zero;
 

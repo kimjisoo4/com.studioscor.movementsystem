@@ -28,7 +28,7 @@ namespace KimScor.MovementSystem
         protected ForwardModifier ForwardMovement;
         protected GravityModifier GravityMovement;
         protected TargetMovement TargetMovement;
-        public bool GetUsingTargetMovement => TargetMovement.isActivate;
+        public bool GetUsingTargetMovement => TargetMovement.IsActivate;
         
         protected virtual void Awake()
         {
@@ -97,7 +97,6 @@ namespace KimScor.MovementSystem
             _Velocity += DirectionMovement.OnMovement(deltaTime);
 
         }
-
         public void OnForwardMovement(float deltaTime)
         {
             if (!_UseMovement)
@@ -115,7 +114,7 @@ namespace KimScor.MovementSystem
 
         public void OnTargetMovement(float deltaTime)
         {
-            if (!TargetMovement.isActivate)
+            if (!TargetMovement.IsActivate)
                 return;
 
             _DeltaVelocity += TargetMovement.OnMovement(deltaTime);
