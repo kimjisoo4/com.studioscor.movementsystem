@@ -90,6 +90,10 @@ namespace KimScor.MovementSystem
         {
             _Direction = Quaternion.Euler(new Vector3(0, angle, 0));
         }
+        public void SetDuration(float duration)
+        {
+            _Duration = duration;
+        }
 
         public void StopTargetMovement()
         {
@@ -108,6 +112,8 @@ namespace KimScor.MovementSystem
             {
                 return Vector3.zero;
             }
+
+            _NormalizedTime = normalizedTime;
 
             if (normalizedTime >= 1.0f)
             {
