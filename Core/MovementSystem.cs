@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Diagnostics;
 
 namespace KimScor.MovementSystem
 {
@@ -21,17 +22,17 @@ namespace KimScor.MovementSystem
         protected Vector3 _LastVelocity = Vector3.zero;
         protected bool _IsGrounded = true;
         protected bool _IsMoving = false;
-
-        public virtual bool GetIsGrounded => _IsGrounded;
-        public virtual bool GetIsMoving => _IsMoving;
-        public virtual float GetMoveStrength => _MoveStrength;
-        public virtual float GetCurrentSpeed => _CurrentSpeed;
-        public virtual float GetCurrentVerticalSpeed => _CurrentVerticalSpeed;
-        public virtual Vector3 GetMoveDirection => _MoveDirection;
-        public virtual Vector3 GetLastMoveDirection => _LastMoveDirection;
-        public virtual Vector3 GetVelocity => _Velocity;
-        public virtual Vector3 GetDeltaVelocity => _DeltaVelocity;
-        public virtual Vector3 GetLastVelocity => _LastVelocity;
+        
+        public virtual bool IsGrounded => _IsGrounded;
+        public virtual bool IsMoving => _IsMoving;
+        public virtual float MoveStrength => _MoveStrength;
+        public virtual float CurrentSpeed => _CurrentSpeed;
+        public virtual float CurrentVerticalSpeed => _CurrentVerticalSpeed;
+        public virtual Vector3 MoveDirection => _MoveDirection;
+        public virtual Vector3 LastMoveDirection => _LastMoveDirection;
+        public virtual Vector3 Velocity => _Velocity;
+        public virtual Vector3 DeltaVelocity => _DeltaVelocity;
+        public virtual Vector3 LastVelocity => _LastVelocity;
 
         #region events
         public event ChangedMovementHandler OnLanded;
@@ -75,18 +76,13 @@ namespace KimScor.MovementSystem
 
         protected abstract bool CheckOnGrounded();
         protected abstract void MovementUpdate(float deltaTime);
-
-        /// <summary>
-        /// Set Teleport MovePosition.
-        /// </summary>
-        /// <param name="position"></param>
         public abstract void SetMovePosition(Vector3 position);
 
         protected virtual void PropertyUpdate()
         {
-            _LastVelocity = GetVelocity + GetDeltaVelocity;
+            _LastVelocity = Velocity + DeltaVelocity;
 
-            Vector3 currentVelocity = GetLastVelocity;
+            Vector3 currentVelocity = LastVelocity;
 
             float currentVerticalSpeed = currentVelocity.y;
 
@@ -95,13 +91,13 @@ namespace KimScor.MovementSystem
             float currentSpeed = currentVelocity.magnitude;
 
 
-            if (GetIsMoving && currentSpeed == 0)
+            if (IsMoving && currentSpeed == 0)
             {
                 _IsMoving = false;
 
                 OnFinishMovement();
             }
-            else if (!GetIsMoving && currentSpeed > 0)
+            else if (!IsMoving && currentSpeed > 0)
             {
                 _IsMoving = true;
 
@@ -147,24 +143,28 @@ namespace KimScor.MovementSystem
             }
         }
 
-        protected void DebugText(string Text)
+        #region EDITOR
+        [Conditional("UNITY_EDITOR")]
+        protected void Log(string log)
         {
-            Debug.Log("[ " + gameObject.name + " ] " + Text);
+            if (DebugMode)
+                UnityEngine.Debug.Log("MovementSystem [" + gameObject.name + "] : " + log);
         }
+        #endregion
 
         #region EventCallBack
 
         protected virtual void OnLand()
         {
             if (DebugMode)
-                DebugText("Landed");
+                Log("Landed");
 
             OnLanded?.Invoke(this);
         }
         protected virtual void OnJump()
         {
             if (DebugMode)
-                DebugText("Jumped");
+                Log("Jumped");
 
             OnJumped?.Invoke(this);
         }
@@ -172,14 +172,14 @@ namespace KimScor.MovementSystem
         protected virtual void OnStartMovement()
         {
             if (DebugMode)
-                DebugText("Started Movement");
+                Log("Started Movement");
 
             OnStartedMovement?.Invoke(this);
         }
         protected virtual void OnFinishMovement()
         {
             if (DebugMode)
-                DebugText("Finished Movement");
+                Log("Finished Movement");
 
             OnFinishedMovement?.Invoke(this);
         }

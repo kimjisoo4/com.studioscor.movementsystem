@@ -135,9 +135,9 @@ namespace KimScor.MovementSystem
                 MovementSystem = movementSystem;
             }
 
-            public override bool IsGrounded => MovementSystem.GetIsGrounded;
+            public override bool IsGrounded => MovementSystem.IsGrounded;
 
-            public override float CurrentVeritcalSpeed => MovementSystem.GetCurrentVerticalSpeed;
+            public override float CurrentVeritcalSpeed => MovementSystem.CurrentVerticalSpeed;
 
             public override float Gravity => MovementSystem.GetGravity;
         }
@@ -158,13 +158,13 @@ namespace KimScor.MovementSystem
 
             public override float MoveSpeed => MovementSystem.GetMoveSpeed;
 
-            public override float Strength => MovementSystem.GetMoveStrength;
+            public override float Strength => MovementSystem.MoveStrength;
 
             public override float AccelateSpeed => MovementSystem.GetAccelateSpeed;
 
-            public override Vector3 MoveDirection => MovementSystem.GetMoveDirection;
+            public override Vector3 MoveDirection => MovementSystem.MoveDirection;
 
-            public override Vector3 LastMoveDirection => MovementSystem.GetLastMoveDirection;
+            public override Vector3 LastMoveDirection => MovementSystem.LastMoveDirection;
 
             public override float DecelerateSpeed => MovementSystem.GetDecelerateSpeed;
         }
@@ -183,7 +183,7 @@ namespace KimScor.MovementSystem
             }
 
             public override float MoveSpeed => MovementSystem.GetMoveSpeed;
-            public override float Strength => MovementSystem.GetMoveStrength;
+            public override float Strength => MovementSystem.MoveStrength;
             public override float AccelateSpeed => MovementSystem.GetAccelateSpeed;
             public override float DecelerateSpeed => MovementSystem.GetDecelerateSpeed;
             public override Transform Transform => MovementSystem.transform;
