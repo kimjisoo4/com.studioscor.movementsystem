@@ -9,25 +9,32 @@ namespace KimScor.MovementSystem
         [SerializeField] protected float _AcceateSpeed = 10f;
         [SerializeField] protected float _DecelerateSpeed = 10f;
         [SerializeField] protected float _Gravity = 9.81f;
-
-        public virtual float GetMoveSpeed => _MoveSpeed;
-        public virtual float GetAccelateSpeed => _AcceateSpeed;
-        public virtual float GetDecelerateSpeed => _DecelerateSpeed;
-        public virtual float GetGravity => _Gravity;
+        [SerializeField] protected float _Mass = 5f;
+        [SerializeField] protected float _Drag = 1f;
+        public virtual float MoveSpeed => _MoveSpeed;
+        public virtual float AccelateSpeed => _AcceateSpeed;
+        public virtual float DecelerateSpeed => _DecelerateSpeed;
+        public virtual float Gravity => _Gravity;
+        public virtual float Mass => _Mass;
+        public virtual float Drag => _Drag;
 
         [Header("[Activate Movement]")]
         [SerializeField] protected bool _UseMovement = true;
         [SerializeField] protected bool _UseSideStep = false;
         [SerializeField] protected bool _UseGravity = true;
-
+        [SerializeField] protected bool _UseAddForce = true;
         public bool UseMovement => _UseMovement;
         public bool UseSideStep => _UseSideStep;
         public bool UseGravity => _UseGravity;
+        public bool UseAddForce => _UseAddForce;
+
+        public bool RemainAddForce => AddForceMovement.IsRemainForce;
 
         protected DirectionalModifier DirectionMovement;
         protected ForwardModifier ForwardMovement;
         protected GravityModifier GravityMovement;
         protected TargetMovement TargetMovement;
+        protected AddForceModifier AddForceMovement;
         public bool GetUsingTargetMovement => TargetMovement.IsActivate;
         
         protected virtual void Awake()
@@ -36,6 +43,7 @@ namespace KimScor.MovementSystem
             ForwardMovement = new ForwardModifier(this);
             GravityMovement = new GravityModifier(this);
             TargetMovement = new TargetMovement();
+            AddForceMovement = new(this);
         }
 
         #region Setter
@@ -87,6 +95,27 @@ namespace KimScor.MovementSystem
         {
             TargetMovement.StopTargetMovement();
         }
+
+        public void SetUseAddForce(bool useAddForce)
+        {
+            _UseAddForce = useAddForce;
+
+            if (!_UseAddForce)
+                AddForceMovement.ResetVelocity();
+        }
+        public void SetAddForce(Vector3 addforce)
+        {
+            if (addforce.y > 0)
+            {
+                SetGrounded(false);
+            }
+
+            AddForceMovement.AddForce(addforce);
+        }
+        public void ResetAddForceMovement()
+        {
+            AddForceMovement.ResetVelocity();
+        }
         #endregion
 
         public void OnDirectionMovement(float deltaTime)
@@ -119,8 +148,30 @@ namespace KimScor.MovementSystem
 
             _DeltaVelocity += TargetMovement.OnMovement(deltaTime);
         }
+        public void OnAddForceMovement(float deltaTime)
+        {
+            if (!_UseAddForce)
+                return;
+
+            _Velocity += AddForceMovement.OnMovement(deltaTime);
+        }
 
         #region Movement Modifier Class
+
+        protected class AddForceModifier : AddForceMovement
+        {
+            public BaseMovementSystem MovementSystem;
+
+            public AddForceModifier(BaseMovementSystem movementSystem)
+            {
+                MovementSystem = movementSystem;
+            }
+            public override float Mass => MovementSystem.Mass;
+
+            public override float Drag => MovementSystem.Drag;
+
+            public override bool IsGrounded => MovementSystem.IsGrounded;
+        }
         protected class GravityModifier : GravityMovement
         {
             public BaseMovementSystem MovementSystem;
@@ -139,7 +190,7 @@ namespace KimScor.MovementSystem
 
             public override float CurrentVeritcalSpeed => MovementSystem.CurrentVerticalSpeed;
 
-            public override float Gravity => MovementSystem.GetGravity;
+            public override float Gravity => MovementSystem.Gravity;
         }
 
         protected class DirectionalModifier : DirectionMovement
@@ -156,17 +207,17 @@ namespace KimScor.MovementSystem
                 MovementSystem = movementSystem;
             }
 
-            public override float MoveSpeed => MovementSystem.GetMoveSpeed;
+            public override float MoveSpeed => MovementSystem.MoveSpeed;
 
             public override float Strength => MovementSystem.MoveStrength;
 
-            public override float AccelateSpeed => MovementSystem.GetAccelateSpeed;
+            public override float AccelateSpeed => MovementSystem.AccelateSpeed;
 
             public override Vector3 MoveDirection => MovementSystem.MoveDirection;
 
             public override Vector3 LastMoveDirection => MovementSystem.LastMoveDirection;
 
-            public override float DecelerateSpeed => MovementSystem.GetDecelerateSpeed;
+            public override float DecelerateSpeed => MovementSystem.DecelerateSpeed;
         }
         protected class ForwardModifier : ForwardMovement
         {
@@ -182,10 +233,10 @@ namespace KimScor.MovementSystem
                 MovementSystem = movementSystem;
             }
 
-            public override float MoveSpeed => MovementSystem.GetMoveSpeed;
+            public override float MoveSpeed => MovementSystem.MoveSpeed;
             public override float Strength => MovementSystem.MoveStrength;
-            public override float AccelateSpeed => MovementSystem.GetAccelateSpeed;
-            public override float DecelerateSpeed => MovementSystem.GetDecelerateSpeed;
+            public override float AccelateSpeed => MovementSystem.AccelateSpeed;
+            public override float DecelerateSpeed => MovementSystem.DecelerateSpeed;
             public override Transform Transform => MovementSystem.transform;
         }
 
