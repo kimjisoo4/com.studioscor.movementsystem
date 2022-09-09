@@ -103,14 +103,21 @@ namespace KimScor.MovementSystem
             if (!_UseAddForce)
                 AddForceMovement.ResetVelocity();
         }
-        public void SetAddForce(Vector3 addforce)
+        public void SetAddForce(Vector3 addforce, bool useOverride = true)
         {
             if (addforce.y > 0)
             {
                 SetGrounded(false);
             }
 
-            AddForceMovement.AddForce(addforce);
+            if (useOverride)
+            {
+                AddForceMovement.OverrideForce(addforce);
+            }
+            else
+            {
+                AddForceMovement.AddForce(addforce);
+            }
         }
         public void ResetAddForceMovement()
         {
