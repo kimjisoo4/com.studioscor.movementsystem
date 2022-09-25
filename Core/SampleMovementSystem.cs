@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace KimScor.MovementSystem
 {
-    public abstract class BaseMovementSystem : MovementSystem
+    public abstract class SampleMovementSystem : MovementSystemBase
     {
         [Header("[Property]")]
         [SerializeField] protected float _MoveSpeed = 5f;
@@ -20,14 +20,13 @@ namespace KimScor.MovementSystem
 
         [Header("[Activate Movement]")]
         [SerializeField] protected bool _UseMovement = true;
-        [SerializeField] protected bool _UseSideStep = false;
+        [SerializeField] protected bool _UseSideStep = true;
         [SerializeField] protected bool _UseGravity = true;
         [SerializeField] protected bool _UseAddForce = true;
         public bool UseMovement => _UseMovement;
         public bool UseSideStep => _UseSideStep;
         public bool UseGravity => _UseGravity;
         public bool UseAddForce => _UseAddForce;
-
         public bool RemainAddForce => AddForceMovement.IsRemainForce;
 
         protected DirectionalModifier DirectionMovement;
@@ -36,6 +35,8 @@ namespace KimScor.MovementSystem
         protected TargetMovement TargetMovement;
         protected AddForceModifier AddForceMovement;
         public bool GetUsingTargetMovement => TargetMovement.IsActivate;
+
+        private bool _GrantedAddUpForce = false;
         
         protected virtual void Awake()
         {
@@ -107,7 +108,7 @@ namespace KimScor.MovementSystem
         {
             if (addforce.y > 0)
             {
-                SetGrounded(false);
+                _GrantedAddUpForce = true;
             }
 
             if (useOverride)
@@ -125,6 +126,28 @@ namespace KimScor.MovementSystem
         }
         #endregion
 
+        protected override void MovementUpdate(float deltaTime)
+        {
+            if (_GrantedAddUpForce)
+            {
+                _GrantedAddUpForce = false;
+
+                SetGrounded(false);
+            }
+
+            if (UseSideStep)
+            {
+                OnDirectionMovement(deltaTime);
+            }
+            else
+            {
+                OnForwardMovement(deltaTime);
+            }
+
+            OnGravityMovement(deltaTime);
+            OnTargetMovement(deltaTime);
+            OnAddForceMovement(deltaTime);
+        }
         public void OnDirectionMovement(float deltaTime)
         {
             if (!_UseMovement)
@@ -167,9 +190,9 @@ namespace KimScor.MovementSystem
 
         protected class AddForceModifier : AddForceMovement
         {
-            public BaseMovementSystem MovementSystem;
+            public SampleMovementSystem MovementSystem;
 
-            public AddForceModifier(BaseMovementSystem movementSystem)
+            public AddForceModifier(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }
@@ -181,14 +204,14 @@ namespace KimScor.MovementSystem
         }
         protected class GravityModifier : GravityMovement
         {
-            public BaseMovementSystem MovementSystem;
+            public SampleMovementSystem MovementSystem;
 
-            public GravityModifier(BaseMovementSystem movementSystem)
+            public GravityModifier(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }
 
-            public void SetMovementSystem(BaseMovementSystem movementSystem)
+            public void SetMovementSystem(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }
@@ -202,14 +225,14 @@ namespace KimScor.MovementSystem
 
         protected class DirectionalModifier : DirectionMovement
         {
-            public BaseMovementSystem MovementSystem;
+            public SampleMovementSystem MovementSystem;
 
-            public DirectionalModifier(BaseMovementSystem movementSystem)
+            public DirectionalModifier(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }
 
-            public void SetMovementSystem(BaseMovementSystem movementSystem)
+            public void SetMovementSystem(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }
@@ -228,14 +251,14 @@ namespace KimScor.MovementSystem
         }
         protected class ForwardModifier : ForwardMovement
         {
-            public BaseMovementSystem MovementSystem;
+            public SampleMovementSystem MovementSystem;
 
-            public ForwardModifier(BaseMovementSystem movementSystem)
+            public ForwardModifier(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }
 
-            public void SetMovementSystem(BaseMovementSystem movementSystem)
+            public void SetMovementSystem(SampleMovementSystem movementSystem)
             {
                 MovementSystem = movementSystem;
             }

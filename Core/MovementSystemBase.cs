@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+
 
 namespace KimScor.MovementSystem
 {
-    public abstract class MovementSystem : MonoBehaviour
+    public abstract class MovementSystemBase : MonoBehaviour
     {
         #region EventHandler
-        public delegate void ChangedMovementHandler(MovementSystem movementSystem);
+        public delegate void ChangedMovementHandler(MovementSystemBase movementSystem);
         #endregion
 
         [Header("[Debug Mode]")]
-        [SerializeField] protected bool DebugMode = false;
+        [SerializeField] protected bool UseDebugMode = false;
 
         protected float _MoveStrength = 0f;
         protected float _CurrentSpeed = 0f;
@@ -42,6 +45,29 @@ namespace KimScor.MovementSystem
         #endregion
 
 
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (!UseDebugMode)
+                return;
+
+            DrawGizmos();
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        protected virtual void DrawGizmos()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(transform.position, MoveDirection * 1f);
+            
+            Gizmos.color = Color.gray;
+            Gizmos.DrawRay(transform.position, LastMoveDirection * 1f);
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawRay(transform.position, LastVelocity);
+        }
+#endif
+
         public void SetMoveDirection(Vector3 direction, float strength = -1f)
         {
             if (direction == Vector3.zero)
@@ -70,7 +96,7 @@ namespace KimScor.MovementSystem
             SetGrounded(CheckOnGrounded());
 
             MovementUpdate(deltaTime);
-
+           
             PropertyUpdate();
         }
 
@@ -147,23 +173,24 @@ namespace KimScor.MovementSystem
         [Conditional("UNITY_EDITOR")]
         protected void Log(string log)
         {
-            if (DebugMode)
+            if (UseDebugMode)
                 UnityEngine.Debug.Log("MovementSystem [" + gameObject.name + "] : " + log);
         }
         #endregion
+
 
         #region EventCallBack
 
         protected virtual void OnLand()
         {
-            if (DebugMode)
+            if (UseDebugMode)
                 Log("Landed");
 
             OnLanded?.Invoke(this);
         }
         protected virtual void OnJump()
         {
-            if (DebugMode)
+            if (UseDebugMode)
                 Log("Jumped");
 
             OnJumped?.Invoke(this);
@@ -171,18 +198,20 @@ namespace KimScor.MovementSystem
 
         protected virtual void OnStartMovement()
         {
-            if (DebugMode)
+            if (UseDebugMode)
                 Log("Started Movement");
 
             OnStartedMovement?.Invoke(this);
         }
         protected virtual void OnFinishMovement()
         {
-            if (DebugMode)
+            if (UseDebugMode)
                 Log("Finished Movement");
 
             OnFinishedMovement?.Invoke(this);
         }
-        #endregion
+#endregion
+
+        
     }
 }
