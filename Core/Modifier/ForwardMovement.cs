@@ -10,6 +10,7 @@ namespace KimScor.MovementSystem
         public abstract float AccelateSpeed { get; }
         public abstract float DecelerateSpeed { get; }
         public abstract Transform Transform { get; }
+        public float CurrentSpeed => _CurrentSpeed;
 
         private float _CurrentSpeed = 0f;
 

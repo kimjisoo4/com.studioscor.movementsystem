@@ -11,6 +11,7 @@ namespace KimScor.MovementSystem
         public abstract Vector3 MoveDirection { get; }
         public abstract Vector3 LastMoveDirection { get; }
 
+        public float CurrentSpeed => _CurrentSpeed;
 
         private float _CurrentSpeed = 0f;
 

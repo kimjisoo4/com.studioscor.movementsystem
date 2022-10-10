@@ -27,24 +27,26 @@ namespace KimScor.MovementSystem
         public bool UseSideStep => _UseSideStep;
         public bool UseGravity => _UseGravity;
         public bool UseAddForce => _UseAddForce;
-        public bool RemainAddForce => AddForceMovement.IsRemainForce;
+        public bool RemainAddForce => _AddForceMovement.IsRemainForce;
 
-        protected DirectionalModifier DirectionMovement;
-        protected ForwardModifier ForwardMovement;
-        protected GravityModifier GravityMovement;
-        protected TargetMovement TargetMovement;
-        protected AddForceModifier AddForceMovement;
-        public bool GetUsingTargetMovement => TargetMovement.IsActivate;
+        public Vector3 CurrentAddForce => _AddForceMovement.Force;
+
+        private DirectionalModifier _DirectionMovement;
+        private ForwardModifier _ForwardMovement;
+        private GravityModifier _GravityMovement;
+        private TargetMovement _TargetMovement;
+        private AddForceModifier _AddForceMovement;
+        public bool GetUsingTargetMovement => _TargetMovement.IsActivate;
 
         private bool _GrantedAddUpForce = false;
         
-        protected virtual void Awake()
+        public virtual void Setup()
         {
-            DirectionMovement = new DirectionalModifier(this);
-            ForwardMovement = new ForwardModifier(this);
-            GravityMovement = new GravityModifier(this);
-            TargetMovement = new TargetMovement();
-            AddForceMovement = new(this);
+            _DirectionMovement = new DirectionalModifier(this);
+            _ForwardMovement = new ForwardModifier(this);
+            _GravityMovement = new GravityModifier(this);
+            _TargetMovement = new TargetMovement();
+            _AddForceMovement = new(this);
         }
 
         #region Setter
@@ -64,37 +66,52 @@ namespace KimScor.MovementSystem
         {
             _Gravity = newGravity;
         }
-        public void SetUseMovement(bool useDirection)
+        public void SetUseMovement(bool useDirection,bool resetVelocity = false)
         {
+            if (_UseMovement == useDirection)
+                return;
+
             _UseMovement = useDirection;
 
-            if (!UseMovement)
-                DirectionMovement.ResetVelocity();
-                ForwardMovement.ResetVelocity();
+            if (resetVelocity)
+                _DirectionMovement.ResetVelocity();
+                _ForwardMovement.ResetVelocity();
         }
         public void SetUseSideStep(bool useSideStep)
         {
+            if (_UseSideStep == useSideStep)
+                return;
+
             _UseSideStep = useSideStep;
+
+            if (!_UseSideStep)
+            {
+                _ForwardMovement.SetCurrentSpeed(_DirectionMovement.CurrentSpeed);
+            }
+            else
+            {
+                _DirectionMovement.SetCurrentSpeed(_ForwardMovement.CurrentSpeed);
+            }
         }
         public void SetUseGravity(bool useGraity)
         {
             _UseGravity = useGraity;
 
             if(!UseGravity)
-                GravityMovement.ResetVelocity();
+                _GravityMovement.ResetVelocity();
         }
 
         public void SetTargetMovement(FTargetMovement targetMovement, float angle)
         {
-            TargetMovement.SetTargetMovement(targetMovement, angle);
+            _TargetMovement.SetTargetMovement(targetMovement, angle);
         }
         public void SetTargetMovementAngle(float angle)
         {
-            TargetMovement.SetAngle(angle);
+            _TargetMovement.SetAngle(angle);
         }
         public void ResetTargetMovement()
         {
-            TargetMovement.StopTargetMovement();
+            _TargetMovement.StopTargetMovement();
         }
 
         public void SetUseAddForce(bool useAddForce)
@@ -102,7 +119,7 @@ namespace KimScor.MovementSystem
             _UseAddForce = useAddForce;
 
             if (!_UseAddForce)
-                AddForceMovement.ResetVelocity();
+                _AddForceMovement.ResetVelocity();
         }
         public void SetAddForce(Vector3 addforce, bool useOverride = true)
         {
@@ -113,16 +130,16 @@ namespace KimScor.MovementSystem
 
             if (useOverride)
             {
-                AddForceMovement.OverrideForce(addforce);
+                _AddForceMovement.OverrideForce(addforce);
             }
             else
             {
-                AddForceMovement.AddForce(addforce);
+                _AddForceMovement.AddForce(addforce);
             }
         }
         public void ResetAddForceMovement()
         {
-            AddForceMovement.ResetVelocity();
+            _AddForceMovement.ResetVelocity();
         }
         #endregion
 
@@ -151,39 +168,49 @@ namespace KimScor.MovementSystem
         public void OnDirectionMovement(float deltaTime)
         {
             if (!_UseMovement)
-                return;
+            {
+                _DirectionMovement.OnMovement(deltaTime);
 
-            _Velocity += DirectionMovement.OnMovement(deltaTime);
+                return;
+            }
+
+
+            _Velocity += _DirectionMovement.OnMovement(deltaTime);
 
         }
         public void OnForwardMovement(float deltaTime)
         {
             if (!_UseMovement)
-                return;
+            {
+                _ForwardMovement.OnMovement(deltaTime);
 
-            _Velocity += ForwardMovement.OnMovement(deltaTime);
+                return;
+            }
+                
+
+            _Velocity += _ForwardMovement.OnMovement(deltaTime);
         }
         public void OnGravityMovement(float deltaTime)
         {
             if (!_UseGravity)
                 return;
 
-            _Velocity += GravityMovement.OnMovement(deltaTime);
+            _Velocity += _GravityMovement.OnMovement(deltaTime);
         }
 
         public void OnTargetMovement(float deltaTime)
         {
-            if (!TargetMovement.IsActivate)
+            if (!_TargetMovement.IsActivate)
                 return;
 
-            _DeltaVelocity += TargetMovement.OnMovement(deltaTime);
+            _DeltaVelocity += _TargetMovement.OnMovement(deltaTime);
         }
         public void OnAddForceMovement(float deltaTime)
         {
             if (!_UseAddForce)
                 return;
 
-            _Velocity += AddForceMovement.OnMovement(deltaTime);
+            _Velocity += _AddForceMovement.OnMovement(deltaTime);
         }
 
         #region Movement Modifier Class

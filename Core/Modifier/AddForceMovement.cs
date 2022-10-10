@@ -14,6 +14,8 @@ namespace KimScor.MovementSystem
         private bool _IsRemainForce = false;
         public bool IsRemainForce => _IsRemainForce;
 
+        public Vector3 Force => _Force;
+
         private bool _WasGrounded = false;
 
         public void OverrideForce(Vector3 newForce)
