@@ -7,6 +7,21 @@ using Sirenix.OdinInspector;
 namespace KimScor.MovementSystem
 {
     [System.Serializable]
+    public struct FSingleTargetMovement
+    {
+        public FSingleTargetMovement(float duration, float distance, AnimationCurve curve)
+        {
+            Duration = duration;
+            Distance = distance;
+            Curve = curve;
+        }
+
+        public float Duration;
+        public float Distance;
+        public AnimationCurve Curve;
+    }
+
+    [System.Serializable]
     public struct FTargetMovement
     {
         [Header(" [ 이동 시간 ] ")]

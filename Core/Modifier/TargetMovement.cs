@@ -6,7 +6,7 @@ namespace KimScor.MovementSystem
 {
     public class TargetMovement : MovementModifier
     {
-        #region
+        #region Events
         public delegate void TargetMovementHandler(TargetMovement targetMovement);
         #endregion
 
@@ -51,11 +51,43 @@ namespace KimScor.MovementSystem
             _IsActivate = false;
             _IsFinished = false;
         }
-
-        public void SetTargetMovement(FTargetMovement curveMove, float angle)
+        
+        public void SetTargetMovement(FTargetMovement curveMove, float angle = 0f)
         {
             SetTargetMovement(curveMove);
             SetAngle(angle);
+        }
+        public void SetTargetMovement(FSingleTargetMovement singleTargetMovement, float angle = 0f)
+        {
+            SetTargetMovement(singleTargetMovement);
+            SetAngle(angle);
+        }
+
+        public void SetTargetMovement(FSingleTargetMovement singleTargetMovement)
+        {
+            if (IsActivate)
+            {
+                OnFinishedMovement?.Invoke(this);
+            }
+
+            _PrevDistanceX = 0f;
+            _PrevDistanceY = 0f;
+            _PrevDistanceZ = 0f;
+
+            _ElapsedTime = 0.0f;
+            _NormalizedTime = 0.0f;
+
+            _IsActivate = true;
+            _IsFinished = false;
+
+            UseMovementX = false;
+            UseMovementY = false;
+            UseMovementZ = true;
+
+            _Duration = singleTargetMovement.Duration;
+            _DistanceZ = singleTargetMovement.Distance;
+            _CurveZ = singleTargetMovement.Curve;
+
         }
         public void SetTargetMovement(FTargetMovement curveMove)
         {
@@ -63,6 +95,16 @@ namespace KimScor.MovementSystem
             {
                 OnFinishedMovement?.Invoke(this);
             }
+
+            _PrevDistanceX = 0f;
+            _PrevDistanceY = 0f;
+            _PrevDistanceZ = 0f;
+
+            _ElapsedTime = 0.0f;
+            _NormalizedTime = 0.0f;
+
+            _IsActivate = true;
+            _IsFinished = false;
 
             _Duration = curveMove.Duration;
             UseMovementX = curveMove.UseMovementX;
@@ -74,16 +116,6 @@ namespace KimScor.MovementSystem
             UseMovementZ = curveMove.UseMovementZ;
             _DistanceZ = curveMove.DistanceZ;
             _CurveZ = curveMove.CurveZ;
-
-            _PrevDistanceX = 0f;
-            _PrevDistanceY = 0f;
-            _PrevDistanceZ = 0f;
-
-            _ElapsedTime = 0.0f;
-            _NormalizedTime = 0.0f;
-
-            _IsActivate = true;
-            _IsFinished = false;
         }
 
         public void SetAngle(float angle)

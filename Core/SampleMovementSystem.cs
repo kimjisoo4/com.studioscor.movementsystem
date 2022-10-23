@@ -23,10 +23,12 @@ namespace KimScor.MovementSystem
         [SerializeField] protected bool _UseSideStep = true;
         [SerializeField] protected bool _UseGravity = true;
         [SerializeField] protected bool _UseAddForce = true;
+        [SerializeField] protected bool _UseTargetMovement = true;
         public bool UseMovement => _UseMovement;
         public bool UseSideStep => _UseSideStep;
         public bool UseGravity => _UseGravity;
         public bool UseAddForce => _UseAddForce;
+        public bool UseTargetMovement => _UseTargetMovement;
         public bool RemainAddForce => _AddForceMovement.IsRemainForce;
 
         public Vector3 CurrentAddForce => _AddForceMovement.Force;
@@ -37,9 +39,10 @@ namespace KimScor.MovementSystem
         private TargetMovement _TargetMovement;
         private AddForceModifier _AddForceMovement;
         public bool GetUsingTargetMovement => _TargetMovement.IsActivate;
-
         private bool _GrantedAddUpForce = false;
-        
+
+        public event TargetMovement.TargetMovementHandler OnFinishedTargetMovement;
+
         public virtual void Setup()
         {
             _DirectionMovement = new DirectionalModifier(this);
@@ -47,7 +50,11 @@ namespace KimScor.MovementSystem
             _GravityMovement = new GravityModifier(this);
             _TargetMovement = new TargetMovement();
             _AddForceMovement = new(this);
+
+            _TargetMovement.OnFinishedMovement += OnFinishedTargetMovement;
         }
+
+
 
         #region Setter
         public void SetMoveSpeed(float newMoveSpeed)
@@ -100,11 +107,18 @@ namespace KimScor.MovementSystem
             if(!UseGravity)
                 _GravityMovement.ResetVelocity();
         }
-
+        public void SetUseTargetMovement(bool useTargetMovement)
+        {
+            _UseTargetMovement = useTargetMovement;
+        }
         public void SetTargetMovement(FTargetMovement targetMovement, float angle)
         {
             _TargetMovement.SetTargetMovement(targetMovement, angle);
         }
+        public void SetTargetMovement(FSingleTargetMovement singleTargetMovement, float angle)
+        {
+            _TargetMovement.SetTargetMovement(singleTargetMovement, angle);
+        }   
         public void SetTargetMovementAngle(float angle)
         {
             _TargetMovement.SetAngle(angle);
@@ -140,6 +154,17 @@ namespace KimScor.MovementSystem
         public void ResetAddForceMovement()
         {
             _AddForceMovement.ResetVelocity();
+        }
+
+        public override void ResetMovement()
+        {
+            base.ResetMovement();
+
+            _AddForceMovement.ResetVelocity();
+            _DirectionMovement.ResetVelocity();
+            _ForwardMovement.ResetVelocity();
+            _GravityMovement.ResetVelocity();
+            _TargetMovement.ResetVelocity();
         }
         #endregion
 

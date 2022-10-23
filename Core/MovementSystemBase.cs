@@ -12,8 +12,10 @@ namespace KimScor.MovementSystem
         public delegate void ChangedMovementHandler(MovementSystemBase movementSystem);
         #endregion
 
-        [Header("[Debug Mode]")]
-        [SerializeField] protected bool UseDebugMode = false;
+        [Header(" [ Ignore Input ] ")]
+        [SerializeField] private bool _IgnoreInput = false;
+        [Header(" [ Debug Mode ] ")]
+        [SerializeField] protected bool _UseDebug = false;
 
         protected float _MoveStrength = 0f;
         protected float _CurrentSpeed = 0f;
@@ -25,7 +27,9 @@ namespace KimScor.MovementSystem
         protected Vector3 _LastVelocity = Vector3.zero;
         protected bool _IsGrounded = true;
         protected bool _IsMoving = false;
-        
+
+        private int _IgnoreInputStack = 0;
+
         public virtual bool IsGrounded => _IsGrounded;
         public virtual bool IsMoving => _IsMoving;
         public virtual float MoveStrength => _MoveStrength;
@@ -36,6 +40,7 @@ namespace KimScor.MovementSystem
         public virtual Vector3 Velocity => _Velocity;
         public virtual Vector3 DeltaVelocity => _DeltaVelocity;
         public virtual Vector3 LastVelocity => _LastVelocity;
+        public bool IgnoreInput => _IgnoreInput;
 
         #region events
         public event ChangedMovementHandler OnLanded;
@@ -48,7 +53,7 @@ namespace KimScor.MovementSystem
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (!UseDebugMode)
+            if (!_UseDebug)
                 return;
 
             DrawGizmos();
@@ -67,9 +72,43 @@ namespace KimScor.MovementSystem
             Gizmos.DrawRay(transform.position, LastVelocity);
         }
 #endif
-
-        public void SetMoveDirection(Vector3 direction, float strength = -1f)
+        public void SetIgnoreInput(bool ignoreInput)
         {
+            if (_IgnoreInput == ignoreInput)
+                return;
+
+            _IgnoreInput = ignoreInput;
+        }
+
+        public void AddIgnoreInput()
+        {
+            _IgnoreInputStack++;
+
+            SetIgnoreInput(_IgnoreInputStack != 0);
+        }
+        public void RemoveIgnoreInput()
+        {
+            _IgnoreInputStack--;
+
+            SetIgnoreInput(_IgnoreInputStack != 0);
+        }
+        public void ClearIngnoreInput()
+        {
+            _IgnoreInputStack = 0;
+
+            SetIgnoreInput(false);
+        }
+
+        public void SetMovementInput(Vector3 direction, float strength = -1f)
+        {
+            if(IgnoreInput)
+            {
+                _MoveDirection = default;
+                _MoveStrength = 0;
+
+                return;
+            }
+
             if (direction == Vector3.zero)
             {
                 _MoveDirection = default;
@@ -103,6 +142,19 @@ namespace KimScor.MovementSystem
         protected abstract bool CheckOnGrounded();
         protected abstract void MovementUpdate(float deltaTime);
         public abstract void SetMovePosition(Vector3 position);
+        public virtual void ResetMovement()
+        {
+            ClearIngnoreInput();
+            ResetVelocity();
+
+            _MoveStrength = 0f;
+            _CurrentSpeed = 0f;
+            _CurrentVerticalSpeed = 0f;
+            _MoveDirection = Vector3.zero;
+            _LastMoveDirection = Vector3.zero;
+
+            PropertyUpdate();
+        }
 
         protected virtual void PropertyUpdate()
         {
@@ -146,7 +198,7 @@ namespace KimScor.MovementSystem
             _DeltaVelocity += velocity;
         }
 
-        public void ResetVelocity()
+        protected void ResetVelocity()
         {
             _Velocity = Vector3.zero;
             _DeltaVelocity = Vector3.zero;
@@ -173,7 +225,7 @@ namespace KimScor.MovementSystem
         [Conditional("UNITY_EDITOR")]
         protected void Log(string log)
         {
-            if (UseDebugMode)
+            if (_UseDebug)
                 UnityEngine.Debug.Log("MovementSystem [" + gameObject.name + "] : " + log);
         }
         #endregion
@@ -183,14 +235,14 @@ namespace KimScor.MovementSystem
 
         protected virtual void OnLand()
         {
-            if (UseDebugMode)
+            if (_UseDebug)
                 Log("Landed");
 
             OnLanded?.Invoke(this);
         }
         protected virtual void OnJump()
         {
-            if (UseDebugMode)
+            if (_UseDebug)
                 Log("Jumped");
 
             OnJumped?.Invoke(this);
@@ -198,14 +250,14 @@ namespace KimScor.MovementSystem
 
         protected virtual void OnStartMovement()
         {
-            if (UseDebugMode)
+            if (_UseDebug)
                 Log("Started Movement");
 
             OnStartedMovement?.Invoke(this);
         }
         protected virtual void OnFinishMovement()
         {
-            if (UseDebugMode)
+            if (_UseDebug)
                 Log("Finished Movement");
 
             OnFinishedMovement?.Invoke(this);
