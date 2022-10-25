@@ -141,7 +141,8 @@ namespace KimScor.MovementSystem
 
         protected abstract bool CheckOnGrounded();
         protected abstract void MovementUpdate(float deltaTime);
-        public abstract void SetMovePosition(Vector3 position);
+        public abstract void SetMovePosition(Vector3 velocity);
+        public abstract void SetPosition(Vector3 position);
         public virtual void ResetMovement()
         {
             ClearIngnoreInput();

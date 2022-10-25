@@ -54,8 +54,6 @@ namespace KimScor.MovementSystem
             _TargetMovement.OnFinishedMovement += OnFinishedTargetMovement;
         }
 
-
-
         #region Setter
         public void SetMoveSpeed(float newMoveSpeed)
         {
