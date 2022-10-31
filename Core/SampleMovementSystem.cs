@@ -24,6 +24,7 @@ namespace KimScor.MovementSystem
         [SerializeField] protected bool _UseGravity = true;
         [SerializeField] protected bool _UseAddForce = true;
         [SerializeField] protected bool _UseTargetMovement = true;
+
         public bool UseMovement => _UseMovement;
         public bool UseSideStep => _UseSideStep;
         public bool UseGravity => _UseGravity;
@@ -43,7 +44,7 @@ namespace KimScor.MovementSystem
 
         public event TargetMovement.TargetMovementHandler OnFinishedTargetMovement;
 
-        public virtual void Setup()
+        protected override void Setup()
         {
             _DirectionMovement = new DirectionalModifier(this);
             _ForwardMovement = new ForwardModifier(this);

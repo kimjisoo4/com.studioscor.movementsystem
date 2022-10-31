@@ -29,6 +29,7 @@ namespace KimScor.MovementSystem
         protected bool _IsMoving = false;
 
         private int _IgnoreInputStack = 0;
+        private bool _WasSetup = false;
 
         public virtual bool IsGrounded => _IsGrounded;
         public virtual bool IsMoving => _IsMoving;
@@ -72,6 +73,23 @@ namespace KimScor.MovementSystem
             Gizmos.DrawRay(transform.position, LastVelocity);
         }
 #endif
+
+        private void Awake()
+        {
+            OnSetup();
+        }
+
+        private void OnSetup() 
+        {
+            if (_WasSetup)
+                return;
+
+            _WasSetup = true;
+
+            Setup();
+        }
+        protected virtual void Setup() { }
+
         public void SetIgnoreInput(bool ignoreInput)
         {
             if (_IgnoreInput == ignoreInput)
@@ -145,6 +163,8 @@ namespace KimScor.MovementSystem
         public abstract void SetPosition(Vector3 position);
         public virtual void ResetMovement()
         {
+            OnSetup();
+
             ClearIngnoreInput();
             ResetVelocity();
 
