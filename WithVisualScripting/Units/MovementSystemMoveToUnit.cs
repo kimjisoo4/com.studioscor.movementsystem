@@ -158,7 +158,7 @@ namespace StudioScor.MovementSystem.VisualScripting
 
             Vector3 position = data.Position * data.Curve.Evaluate(data.NormalizedTime);
 
-            data.MovementSystem.AddPosition(position - data.PrevPosition);
+            data.MovementSystem.MovePosition(position - data.PrevPosition);
 
             data.PrevPosition = position;
 

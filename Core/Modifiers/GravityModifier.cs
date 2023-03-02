@@ -3,6 +3,7 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
+
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Gravity Modifier", order: 10)]
     public class GravityModifier : Modifier
     {

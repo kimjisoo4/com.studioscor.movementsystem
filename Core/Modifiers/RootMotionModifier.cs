@@ -29,7 +29,7 @@ namespace StudioScor.MovementSystem
 
         public override void ProcessMovement(float deltaTime)
         {
-            MovementSystem.AddPosition(_RootPosition);
+            MovementSystem.MovePosition(_RootPosition);
         }
 
         private void OnAnimatorMove()

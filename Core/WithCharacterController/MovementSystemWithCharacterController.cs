@@ -13,6 +13,9 @@ namespace StudioScor.MovementSystem
         private Vector3 _LastVelocity;
         protected override Vector3 LastVelocity => _LastVelocity;
 
+        private Vector3 _TeleporPositiont;
+        private bool _WasTeleport;
+
         private void Reset()
         {
             gameObject.TryGetComponentInParentOrChildren(out _CharacterController);
@@ -41,6 +44,25 @@ namespace StudioScor.MovementSystem
             }
 
             _CharacterController.Move(_LastVelocity * deltaTime);
+
+            if (_WasTeleport)
+            {
+                _WasTeleport = false;
+
+                OnTeleport();
+            }
+        }
+        private void OnTeleport()
+        {
+            _CharacterController.enabled = false;
+            _CharacterController.transform.position = _TeleporPositiont;
+            _CharacterController.enabled = true;
+        }
+
+        public override void Teleport(Vector3 position)
+        {
+            _TeleporPositiont = position;
+            _WasTeleport = true;
         }
     }
 

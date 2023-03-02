@@ -5,10 +5,25 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
+    public interface IMovementSystem
+    {
+        public Transform transform { get; }
+
+        public float MoveStrength { get; }
+        public Vector3 MoveDirection { get; }
+        public bool IsGrounded { get; }
+
+        public void SetGrounded(bool isGrounded);
+        public void Teleport(Vector3 position = default);
+
+        public void AddVelocity(Vector3 velocity);
+        public void MovePosition(Vector3 position);
+    }
+
 
     [DefaultExecutionOrder(MovementSystemxcutionOrder.MAIN_ORDER)]
     [AddComponentMenu("StudioScor/MovementSystem/MovementSystem", order : 0)]
-    public abstract class MovementSystemComponent : BaseMonoBehaviour
+    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem
     {
         #region EventHandler
         public delegate void ChangedMovementHandler(MovementSystemComponent movementSystem);
@@ -174,11 +189,12 @@ namespace StudioScor.MovementSystem
             return false;
         }
 
+        
         public void AddVelocity(Vector3 velocity)
         {
             _AddVelocity += velocity;
         }
-        public void AddPosition(Vector3 addPosition)
+        public void MovePosition(Vector3 addPosition)
         {
             _AddPosition += addPosition;
         }
@@ -263,6 +279,7 @@ namespace StudioScor.MovementSystem
             }
         }
 
+        public abstract void Teleport(Vector3 position);
         protected abstract void OnMovement(float deltaTime);
         protected virtual void PropertyUpdate()
         {

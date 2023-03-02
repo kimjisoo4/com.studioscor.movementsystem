@@ -9,7 +9,7 @@ namespace StudioScor.MovementSystem
         {
             if (MovementSystem.IsGrounded && MovementSystem.WasGrounded)
             {
-                MovementSystem.AddPosition(transform.up * -MovementSystem.GroundDistance);
+                MovementSystem.MovePosition(transform.up * -MovementSystem.GroundDistance);
             }
         }
     }
