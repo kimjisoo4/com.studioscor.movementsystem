@@ -8,10 +8,12 @@ namespace StudioScor.MovementSystem
     {
         [Header(" [ With Character Controller ] ")]
         [SerializeField] private CharacterController _CharacterController;
+        [SerializeField] private LayerMask _GroundLayer;
         [SerializeField, Range(0.01f, 1f)] private float _RadiusScale = 1f;
         [SerializeField] private float _StairOffset = 0.25f;
         [SerializeField] private float _AirOffset = 0.05f;
 
+        protected LayerMask GroundLayer => _GroundLayer;
         private float Offset => IsGrounded ? _StairOffset : _AirOffset;
         
         private void OnDrawGizmosSelected()
@@ -34,15 +36,25 @@ namespace StudioScor.MovementSystem
             Gizmos.DrawWireSphere(start + direction * (distance + _AirOffset), radius);
         }
 
+        private void Reset()
+        {
+            SetReference();
+        }
+
         protected override void OnSetup()
         {
             base.OnSetup();
 
+            SetReference();
+        }
+
+        private void SetReference()
+        {
             if (!_CharacterController)
             {
-                if(!gameObject.TryGetComponentInParentOrChildren(out _CharacterController))
+                if (!gameObject.TryGetComponentInParentOrChildren(out _CharacterController))
                 {
-                    Log("Character Contollre Is NULL", true);
+                    Log($"{nameof(_CharacterController)} is NULL!!", true);
                 }
             }
         }
@@ -58,7 +70,6 @@ namespace StudioScor.MovementSystem
 
             bool isHit = SUtility.Physics.DrawSphereCast(start, radius, direction, distance + Offset, out RaycastHit hit, GroundLayer, UseDebug);
 
-            SetGrounded(isHit);
 
             if (isHit)
             {
@@ -77,6 +88,8 @@ namespace StudioScor.MovementSystem
                 _Distance = default;
                 _Point = default;
             }
+
+            SetGrounded(isHit);
         }
     }
 

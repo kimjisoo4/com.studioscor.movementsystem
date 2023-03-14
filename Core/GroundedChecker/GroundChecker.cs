@@ -3,22 +3,33 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
+    public interface IGroundChecker
+    {
+        public void SetGrounded(bool isGrounded);
+        public void CheckGrounded();
+
+        public bool IsGrounded { get; }
+        public bool WasGrounded { get; }
+        public Vector3 Normal { get; }
+        public Vector3 Point { get; }
+        public float Distance { get; }
+    }
+
     [AddComponentMenu("StudioScor/MovementSystem/GroundChecker", order: 0)]
-    public abstract class GroundChecker : BaseMonoBehaviour
+    public abstract class GroundChecker : BaseMonoBehaviour, IGroundChecker
     {
         #region Event
         public delegate void ChangedGroundedStateHandler(GroundChecker groundChecker, bool isGrounded);
         #endregion
-        [Header(" [ Ground Checker ] ")]
-        [SerializeField] private LayerMask _GroundLayer;
 
+        [Header(" [ Ground Checker ] ")]
         protected Vector3 _Normal;
         protected Vector3 _Point;
         protected float _Distance;
         protected bool _IsGrounded;
         protected bool _WasGrounded;
 
-        protected LayerMask GroundLayer => _GroundLayer;
+
         public bool IsGrounded => _IsGrounded;
         public bool WasGrounded => _WasGrounded;
         public Vector3 Normal => _Normal;

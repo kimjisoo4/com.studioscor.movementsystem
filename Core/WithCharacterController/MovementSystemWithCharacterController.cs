@@ -52,6 +52,7 @@ namespace StudioScor.MovementSystem
                 OnTeleport();
             }
         }
+
         private void OnTeleport()
         {
             _CharacterController.enabled = false;
