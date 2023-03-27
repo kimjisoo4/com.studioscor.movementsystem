@@ -12,38 +12,38 @@ namespace StudioScor.MovementSystem.VisualScripting
     {
         private void Awake()
         {
-            var movementSystemComponent = GetComponent<MovementSystemComponent>();
+            var movementSystem = GetComponent<IMovementSystemEvent>();
 
-            movementSystemComponent.OnLanded += MovementSystemComponent_OnLanded;
-            movementSystemComponent.OnJumped += MovementSystemComponent_OnJumped;
-            movementSystemComponent.OnStartedMovement += MovementSystemComponent_OnStartedMovement;
-            movementSystemComponent.OnFinishedMovement += MovementSystemComponent_OnFinishedMovement;
+            movementSystem.OnLanded += MovementSystemComponent_OnLanded;
+            movementSystem.OnJumped += MovementSystemComponent_OnJumped;
+            movementSystem.OnStartedMovement += MovementSystemComponent_OnStartedMovement;
+            movementSystem.OnFinishedMovement += MovementSystemComponent_OnFinishedMovement;
         }
         private void OnDestroy()
         {
-            var movementSystemComponent = GetComponent<MovementSystemComponent>();
+            var movementSystem = GetComponent<IMovementSystemEvent>();
 
-            movementSystemComponent.OnLanded -= MovementSystemComponent_OnLanded;
-            movementSystemComponent.OnJumped -= MovementSystemComponent_OnJumped;
-            movementSystemComponent.OnStartedMovement -= MovementSystemComponent_OnStartedMovement;
-            movementSystemComponent.OnFinishedMovement -= MovementSystemComponent_OnFinishedMovement;
+            movementSystem.OnLanded -= MovementSystemComponent_OnLanded;
+            movementSystem.OnJumped -= MovementSystemComponent_OnJumped;
+            movementSystem.OnStartedMovement -= MovementSystemComponent_OnStartedMovement;
+            movementSystem.OnFinishedMovement -= MovementSystemComponent_OnFinishedMovement;
         }
-        private void MovementSystemComponent_OnFinishedMovement(MovementSystemComponent movementSystem)
+        private void MovementSystemComponent_OnFinishedMovement(IMovementSystemEvent movementSystem)
         {
             EventBus.Trigger(new EventHook(MovementSystemWithVisualScripting.MOVEMENTSYSTEM_ON_FINISHED_MOVEMENT, movementSystem));
         }
 
-        private void MovementSystemComponent_OnStartedMovement(MovementSystemComponent movementSystem)
+        private void MovementSystemComponent_OnStartedMovement(IMovementSystemEvent movementSystem)
         {
             EventBus.Trigger(new EventHook(MovementSystemWithVisualScripting.MOVEMENTSYSTEM_ON_STARTED_MOVEMENT, movementSystem));
         }
 
-        private void MovementSystemComponent_OnJumped(MovementSystemComponent movementSystem)
+        private void MovementSystemComponent_OnJumped(IMovementSystemEvent movementSystem)
         {
             EventBus.Trigger(new EventHook(MovementSystemWithVisualScripting.MOVEMENTSYSTEM_ON_JUMPED, movementSystem));
         }
 
-        private void MovementSystemComponent_OnLanded(MovementSystemComponent movementSystem)
+        private void MovementSystemComponent_OnLanded(IMovementSystemEvent movementSystem)
         {
             EventBus.Trigger(new EventHook(MovementSystemWithVisualScripting.MOVEMENTSYSTEM_ON_LANDED, movementSystem));
         }

@@ -1,4 +1,5 @@
 ﻿#if SCOR_ENABLE_VISUALSCRIPTING
+using UnityEngine;
 using Unity.VisualScripting;
 using System;
 using StudioScor.Utilities.VisualScripting;
@@ -15,11 +16,11 @@ namespace StudioScor.MovementSystem.VisualScripting
 
         protected override void Definition()
         {
-            MovementSystem = ValueInput<MovementSystemComponent>(nameof(MovementSystem), null).NullMeansSelf();
+            MovementSystem = ValueInput<GameObject>(nameof(MovementSystem), null).NullMeansSelf();
         }
     }
 
-    public abstract class MovementSystemEventUnit : CustomEventUnit<MovementSystemComponent, EmptyEventArgs>
+    public abstract class MovementSystemEventUnit : CustomInterfaceEventUnit<IMovementSystemEvent, EmptyEventArgs>
     {
         public override Type MessageListenerType => typeof(MovementSystemEventListener);
     }

@@ -5,9 +5,12 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
+    public delegate void ChangedMovementHandler(IMovementSystemEvent movementSystem);
+
     public interface IMovementSystem
     {
         public Transform transform { get; }
+        public GameObject gameObject { get; }
 
         public float MoveStrength { get; }
         public Vector3 MoveDirection { get; }
@@ -20,14 +23,27 @@ namespace StudioScor.MovementSystem
         public void MovePosition(Vector3 position);
     }
 
+    public enum EMovementSystemEventType
+    {
+        OnJumped,
+        OnLanded,
+        OnStartedMovement,
+        OnFinishedMovement,
+    }
+
+    public interface IMovementSystemEvent
+    {
+        public event ChangedMovementHandler OnLanded;
+        public event ChangedMovementHandler OnJumped;
+        public event ChangedMovementHandler OnStartedMovement;
+        public event ChangedMovementHandler OnFinishedMovement;
+    }
 
     [DefaultExecutionOrder(MovementSystemxcutionOrder.MAIN_ORDER)]
     [AddComponentMenu("StudioScor/MovementSystem/MovementSystem", order : 0)]
-    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem
+    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem, IMovementSystemEvent
     {
-        #region EventHandler
-        public delegate void ChangedMovementHandler(MovementSystemComponent movementSystem);
-        #endregion
+       
 
         [Header(" [ Movement System ] ")]
         // Grounded  
@@ -199,6 +215,16 @@ namespace StudioScor.MovementSystem
             _AddPosition += addPosition;
         }
 
+        public void ForceOnGrounded()
+        {
+            bool prevGrounded = _IsGrounded;
+
+            _WasGrounded = true;
+            _IsGrounded = true;
+
+            if (!prevGrounded)
+                Callback_OnLanded();
+        }
         public void ForceUnGrounded()
         {
             bool prevGrounded = _IsGrounded;
