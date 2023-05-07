@@ -3,9 +3,13 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
+    public interface IGravityModifier : IMovementModifier
+    {
+        public void SetGravity(float newGravity);
+    }
 
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Gravity Modifier", order: 10)]
-    public class GravityModifier : Modifier
+    public class GravityModifier : MovementModifier, IGravityModifier
     {
         [Header(" [ Gravity Movement ] ")]
         [SerializeField] private float _Gravity = 9.81f;

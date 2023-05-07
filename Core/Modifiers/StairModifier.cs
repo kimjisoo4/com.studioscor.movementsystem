@@ -2,8 +2,13 @@
 
 namespace StudioScor.MovementSystem
 {
+    public interface IStairModifier : IMovementModifier
+    {
+
+    }
+
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Stair Modifier", order: 20)]
-    public class StairModifier : Modifier
+    public class StairModifier : MovementModifier
     {
         public override void ProcessMovement(float deltaTime)
         {

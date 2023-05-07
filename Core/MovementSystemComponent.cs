@@ -7,28 +7,49 @@ namespace StudioScor.MovementSystem
 {
     public delegate void ChangedMovementHandler(IMovementSystemEvent movementSystem);
 
+    public static class MovementSystemUtility
+    {
+        public static bool TryGetModifier<T>(this IMovementSystem movementSystem, out T movementModifier) where T : IMovementModifier
+        {
+            foreach (var modifier in movementSystem.Modifiers)
+            {
+                if (modifier.GetType() == typeof(T))
+                {
+                    movementModifier = (T)modifier;
+
+                    return true;
+                }
+            }
+            
+            movementModifier = default(T);
+
+            return false;
+        }
+    }
     public interface IMovementSystem
     {
         public Transform transform { get; }
         public GameObject gameObject { get; }
+        public IReadOnlyList<IMovementModifier> Modifiers { get; }
 
         public float MoveStrength { get; }
         public Vector3 MoveDirection { get; }
         public bool IsGrounded { get; }
+        public bool IsMoving { get; }
+
+        public Vector3 PrevVelocity { get; }
+        public Vector3 PrevVelocityXZ { get; }
+        public float PrevSpeed { get; }
+        public float PrevGravity { get; }
 
         public void SetGrounded(bool isGrounded);
-        public void Teleport(Vector3 position = default);
+        public void SetGroundState(Vector3 point, Vector3 normal, float distance);
 
+        public void SetMoveDirection(Vector3 direction, float stregnth = -1f);
         public void AddVelocity(Vector3 velocity);
         public void MovePosition(Vector3 position);
-    }
-
-    public enum EMovementSystemEventType
-    {
-        OnJumped,
-        OnLanded,
-        OnStartedMovement,
-        OnFinishedMovement,
+        public void Teleport(Vector3 position = default);
+        public void UpdateMovement(float deltaTime);
     }
 
     public interface IMovementSystemEvent
@@ -43,8 +64,6 @@ namespace StudioScor.MovementSystem
     [AddComponentMenu("StudioScor/MovementSystem/MovementSystem", order : 0)]
     public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem, IMovementSystemEvent
     {
-       
-
         [Header(" [ Movement System ] ")]
         // Grounded  
         private bool _IsGrounded;
@@ -59,9 +78,7 @@ namespace StudioScor.MovementSystem
         public Vector3 GroundNormal => _GroundNormal;
 
         // Modifier
-        protected List<IMovementModifier> _EarlyModifiers;
-        protected List<IMovementModifier> _DefaultModifiers;
-        protected List<IMovementModifier> _LateModifiers;
+        protected readonly List<IMovementModifier> _Modifiers = new();
 
         // Input
         protected Vector3 _MoveDirection;
@@ -72,8 +89,8 @@ namespace StudioScor.MovementSystem
         protected Vector3 _AddVelocity;
         protected Vector3 _AddPosition;
 
-        public Vector3 MomentVelocity => _AddVelocity;
-        public Vector3 MomentPosition => _AddPosition;
+        protected Vector3 Velocity => _AddVelocity;
+        protected Vector3 Position => _AddPosition;
 
         // State
         protected bool _IsMoving;
@@ -82,12 +99,13 @@ namespace StudioScor.MovementSystem
         protected float _PrevSpeed;
         protected float _PrevGravity;
 
-        protected abstract Vector3 LastVelocity { get; }
+        public abstract Vector3 LastVelocity { get; }
         public bool IsMoving => _IsMoving;
         public Vector3 PrevVelocity => _PrevVelocity;
         public Vector3 PrevVelocityXZ => _PrevVelocityXZ;
         public float PrevSpeed => _PrevSpeed;
         public float PrevGravity => _PrevGravity;
+        public IReadOnlyList<IMovementModifier> Modifiers => _Modifiers;
 
         // Events
         public event ChangedMovementHandler OnLanded;
@@ -102,10 +120,6 @@ namespace StudioScor.MovementSystem
 
         private void Setuo()
         {
-            _EarlyModifiers = new();
-            _DefaultModifiers = new();
-            _LateModifiers = new();
-
             OnSetup();
         }
 
@@ -137,74 +151,26 @@ namespace StudioScor.MovementSystem
 
         public void AddModifier(IMovementModifier modifier)
         {
-            switch (modifier.UpdateType)
-            {
-                case EMovementUpdateType.Early:
-                    _EarlyModifiers.Add(modifier);
-                    break;
-                case EMovementUpdateType.Default:
-                    _DefaultModifiers.Add(modifier);
-                    break;
-                case EMovementUpdateType.Late:
-                    _LateModifiers.Add(modifier);
-                    break;
-                default:
-                    break;
-            }
+            _Modifiers.Add(modifier);
+
+            _Modifiers.Sort(SortModifier);
         }
         public void RemoveModifier(IMovementModifier modifier)
         {
-            switch (modifier.UpdateType)
-            {
-                case EMovementUpdateType.Early:
-                    _EarlyModifiers.Remove(modifier);
-                    break;
-                case EMovementUpdateType.Default:
-                    _DefaultModifiers.Remove(modifier);
-                    break;
-                case EMovementUpdateType.Late:
-                    _LateModifiers.Remove(modifier);
-                    break;
-                default:
-                    break;
-            }
+            _Modifiers.Remove(modifier);
         }
 
-        public bool FindModifier(Type modifierType, out IMovementModifier movementModifier)
+        private int SortModifier(IMovementModifier lhs, IMovementModifier rhs)
         {
-            foreach (var modifier in _DefaultModifiers)
+            if(lhs.UpdateType < rhs.UpdateType)
             {
-                if (modifier.GetType() == modifierType)
-                {
-                    movementModifier = modifier;
-
-                    return true;
-                }
+                return -1;
             }
-            foreach (var modifier in _EarlyModifiers)
+            else
             {
-                if (modifier.GetType() == modifierType)
-                {
-                    movementModifier = modifier;
-
-                    return true;
-                }
+                return 1;
             }
-            foreach (var modifier in _LateModifiers)
-            {
-                if (modifier.GetType() == modifierType)
-                {
-                    movementModifier = modifier;
-
-                    return true;
-                }
-            }
-
-            movementModifier = null;
-
-            return false;
         }
-
         
         public void AddVelocity(Vector3 velocity)
         {
@@ -223,7 +189,10 @@ namespace StudioScor.MovementSystem
             _IsGrounded = true;
 
             if (!prevGrounded)
+            {
+                OnLand();
                 Callback_OnLanded();
+            }
         }
         public void ForceUnGrounded()
         {
@@ -235,7 +204,10 @@ namespace StudioScor.MovementSystem
             SetGroundState(Vector3.zero, Vector3.up, 0f);
 
             if (prevGrounded)
+            {
+                OnJump();
                 Callback_OnJumped();
+            }
         }
         public void SetGrounded(bool isGrounded)
         {
@@ -247,10 +219,12 @@ namespace StudioScor.MovementSystem
 
             if (IsGrounded)
             {
+                OnLand();
                 Callback_OnLanded();
             }
             else
             {
+                OnJump();
                 Callback_OnJumped();
             }
         }
@@ -263,15 +237,7 @@ namespace StudioScor.MovementSystem
 
         public void UpdateMovement(float deltaTime)
         {
-            foreach (var modifier in _EarlyModifiers)
-            {
-                modifier.ProcessMovement(deltaTime);
-            }
-            foreach (var modifier in _DefaultModifiers)
-            {
-                modifier.ProcessMovement(deltaTime);
-            }
-            foreach (var modifier in _LateModifiers)
+            foreach (var modifier in _Modifiers)
             {
                 modifier.ProcessMovement(deltaTime);
             }
@@ -295,12 +261,14 @@ namespace StudioScor.MovementSystem
             {
                 _IsMoving = false;
 
+                OnFinishMovement();
                 Callback_OnFinishdMovement();
             }
             else if (!_IsMoving && PrevSpeed > 0)
             {
                 _IsMoving = true;
 
+                OnStartMovement();
                 Callback_OnStartedMovement();
             }
         }
@@ -318,6 +286,23 @@ namespace StudioScor.MovementSystem
 
             _PrevVelocityXZ = velocity;
             _PrevSpeed = _PrevVelocityXZ.magnitude;
+        }
+
+        protected virtual void OnLand()
+        {
+
+        }
+        protected virtual void OnJump()
+        {
+
+        }
+        protected virtual void OnStartMovement()
+        {
+
+        }
+        protected virtual void OnFinishMovement()
+        {
+
         }
 
         #region CallBack

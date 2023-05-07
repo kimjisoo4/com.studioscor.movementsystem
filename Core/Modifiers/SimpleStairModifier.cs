@@ -3,7 +3,7 @@
 namespace StudioScor.MovementSystem
 {
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Simple Stair Modifier", order: 25)]
-    public class SimpleStairModifier : Modifier
+    public class SimpleStairModifier : MovementModifier
     {
         [Header(" [ Simple Stair Movement ] ")]
         [SerializeField] private float _Gravity = 9.81f;

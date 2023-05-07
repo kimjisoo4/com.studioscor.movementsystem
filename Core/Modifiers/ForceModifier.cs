@@ -4,7 +4,7 @@ using StudioScor.Utilities;
 namespace StudioScor.MovementSystem
 {
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Force Modifier", order: 30)]
-    public class ForceModifier : Modifier
+    public class ForceModifier : MovementModifier
     {
         #region Event
         public delegate void ForceModifierEventHandler(MovementSystemComponent movementSystem, ForceModifier forceModifier);

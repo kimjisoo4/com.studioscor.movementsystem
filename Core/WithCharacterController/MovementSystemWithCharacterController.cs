@@ -11,7 +11,7 @@ namespace StudioScor.MovementSystem
         [SerializeField] private CharacterController _CharacterController;
 
         private Vector3 _LastVelocity;
-        protected override Vector3 LastVelocity => _LastVelocity;
+        public override Vector3 LastVelocity => _LastVelocity;
 
         private Vector3 _TeleporPositiont;
         private bool _WasTeleport;
@@ -40,7 +40,7 @@ namespace StudioScor.MovementSystem
 
             if(_AddPosition != default)
             {
-                _LastVelocity += _AddPosition / deltaTime;
+                _LastVelocity += _AddPosition.SafeDivide(deltaTime);
             }
 
             _CharacterController.Move(_LastVelocity * deltaTime);

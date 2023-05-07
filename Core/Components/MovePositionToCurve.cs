@@ -3,7 +3,7 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
-    public class MovePositionToCurve : BaseStateMono
+    public class MovePositionToCurve : BaseMonoBehaviour
     {
         [Header(" [ Add Position To Curve ] ")]
         [SerializeField] private float _Duration = 0.5f;
@@ -30,6 +30,12 @@ namespace StudioScor.MovementSystem
         [SerializeField, SCondition(nameof(_UseZ), true)] private float _DistanceZ = 5f;
         [SerializeField, SCondition(nameof(_UseZ), true)] private AnimationCurve _CurveZ = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
+        [Header(" [ Play Speed ] ")]
+        [SerializeField] private float _PlaySpeed = 1f;
+
+        [Header(" [ Auto Playing ] ")]
+        [SerializeField] private bool _AutoPlaying = true;
+
         private IMovementSystem _MovementSystem;
 
         private readonly ReachValueToTime _ReachValueToTimeX = new();
@@ -37,27 +43,22 @@ namespace StudioScor.MovementSystem
         private readonly ReachValueToTime _ReachValueToTimeZ = new();
 
         private float _Strength = 1f;
-        private float _Progress = 0f;
+        private float _NormalizedTime = 0f;
         private float _ElapsedTime = 0f;
 
         private Quaternion _Rotate;
         private bool _WasInput = false;
         private Vector3 _InputDirection = default;
 
-        public override bool CanEnterState()
+        private bool _IsPlaying = false;
+        
+
+        public float NormalizedTime => _NormalizedTime;
+
+        public void SetPlaySpeed(float newSpeed)
         {
-            if (!base.CanEnterState())
-                return false;
-
-            if (_MovementSystem is null)
-                return false;
-
-            if (_Duration <= 0f)
-                return false;
-
-            return true;
+            _PlaySpeed = newSpeed;
         }
-
         public void SetStrength(float strength)
         {
             _Strength = strength;
@@ -90,9 +91,52 @@ namespace StudioScor.MovementSystem
             transform.TryGetComponentInParentOrChildren(out _MovementSystem);
         }
 
-        protected override void EnterState()
+        private void OnEnable()
         {
-            _Progress = 0f;
+            if (_AutoPlaying)
+                OnMovement();
+        }
+        private void OnDisable()
+        {
+            EndMovement();
+        }
+        
+        private void Update()
+        {
+            if (_UpdateState != EUpdateState.Update)
+                return;
+
+            float deltaTime = Time.deltaTime * _PlaySpeed;
+
+            UpdateMovement(deltaTime);
+        }
+        private void FixedUpdate()
+        {
+            if (_UpdateState != EUpdateState.Fixed)
+                return;
+
+            float deltaTime = Time.fixedDeltaTime * _PlaySpeed;
+
+            UpdateMovement(deltaTime);
+        }
+        private void LateUpdate()
+        {
+            if (_UpdateState != EUpdateState.Late)
+                return;
+
+            float deltaTime = Time.deltaTime * _PlaySpeed;
+
+            UpdateMovement(deltaTime);
+        }
+
+        public void OnMovement()
+        {
+            if (_IsPlaying)
+                return;
+
+            _IsPlaying = true;
+
+            _NormalizedTime = 0f;
             _ElapsedTime = 0f;
 
             CalcRotate();
@@ -116,63 +160,69 @@ namespace StudioScor.MovementSystem
                 _ReachValueToTimeZ.OnMovement(distance, _CurveZ);
             }
         }
-        protected override void ExitState()
+        public void EndMovement()
         {
+            if (!_IsPlaying)
+                return;
+
+            _IsPlaying = false;
+
             _WasInput = false;
+
+            _ReachValueToTimeX.EndMovement();
+            _ReachValueToTimeY.EndMovement();
+            _ReachValueToTimeZ.EndMovement();
         }
 
-        private void Update()
+        public void UpdateMovementToNormalizedTime(float normalizedTime)
         {
-            if (_UpdateState != EUpdateState.Update)
+            if (!_IsPlaying)
                 return;
 
-            float deltaTime = Time.deltaTime;
-
-            UpdateState(deltaTime);
-        }
-        private void FixedUpdate()
-        {
-            if (_UpdateState != EUpdateState.Fixed)
-                return;
-
-            float deltaTime = Time.fixedDeltaTime;
-
-            UpdateState(deltaTime);
-        }
-        private void LateUpdate()
-        {
-            if (_UpdateState != EUpdateState.Late)
-                return;
-
-            float deltaTime = Time.deltaTime;
-
-            UpdateState(deltaTime);
-        }
-
-        public void UpdateState(float deltaTime)
-        {
-            _ElapsedTime += deltaTime;
-            _Progress = _ElapsedTime.SafeDivide(_Duration);
-
-            _Progress = Mathf.Min(1f, _Progress);
+            _NormalizedTime = normalizedTime;
 
             if (_UseUpdateDirection)
                 CalcRotate();
 
-            float x = _ReachValueToTimeX.UpdateMovement(_Progress);
-            float y = _ReachValueToTimeY.UpdateMovement(_Progress);
-            float z = _ReachValueToTimeZ.UpdateMovement(_Progress);
+            Movement();
+        }
+        public void UpdateMovement(float deltaTime)
+        {
+            if (!_IsPlaying)
+                return;
+
+            CalcNormalizedTime(deltaTime);
+
+            if (_UseUpdateDirection)
+                CalcRotate();
+
+            Movement();
+        }
+
+        private void Movement()
+        {
+            float x = _ReachValueToTimeX.UpdateMovement(_NormalizedTime);
+            float y = _ReachValueToTimeY.UpdateMovement(_NormalizedTime);
+            float z = _ReachValueToTimeZ.UpdateMovement(_NormalizedTime);
 
             Vector3 addPosition = new Vector3(x, y, z);
 
             _MovementSystem.MovePosition(_Rotate * addPosition);
 
-            if (_Progress < 1f)
+            if (_NormalizedTime < 1f)
                 return;
 
-            ForceExitState();
+            EndMovement();
         }
 
+
+        private void CalcNormalizedTime(float deltaTime)
+        {
+            _ElapsedTime += deltaTime;
+            _NormalizedTime = _ElapsedTime.SafeDivide(_Duration);
+
+            _NormalizedTime = Mathf.Min(1f, _NormalizedTime);
+        }
 
         private void CalcRotate()
         {
@@ -210,22 +260,44 @@ namespace StudioScor.MovementSystem
             }
         }
 
-        private void CalcRotateToMoveDirection()
-        {
-            _Rotate = Quaternion.LookRotation(_MovementSystem.MoveDirection, _MovementSystem.transform.up);
-        }
         private void CalcRotateToLocal()
         {
             Vector3 direction = _MovementSystem.transform.TransformDirection(_Direction);
 
             _Rotate = Quaternion.LookRotation(direction);
         }
+        private void CalcRotateToMoveDirection()
+        {
+            if (_MovementSystem.MoveDirection.SafeEqauls(Vector3.zero))
+            {
+                CalcRotateToLocal();
+
+                return;
+            }
+
+            _Rotate = Quaternion.LookRotation(_MovementSystem.MoveDirection);
+        }
+
         private void CalcRotateToWolrd()
         {
+            if (_Direction.SafeEqauls(Vector3.zero))
+            {
+                CalcRotateToLocal();
+
+                return;
+            }
+
             _Rotate = Quaternion.LookRotation(_Direction);
         }
         private void CalcRotateToScript()
         {
+            if (_InputDirection.SafeEqauls(Vector3.zero))
+            {
+                CalcRotateToLocal();
+
+                return;
+            }
+            
             _Rotate = Quaternion.LookRotation(_InputDirection);
         }
     }

@@ -5,7 +5,7 @@ namespace StudioScor.MovementSystem
 
     [DefaultExecutionOrder(MovementSystemxcutionOrder.SUB_ORDER)]
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Modifier", order : 10)]
-    public abstract class Modifier : BaseMonoBehaviour, IMovementModifier
+    public abstract class MovementModifier : BaseMonoBehaviour, IMovementModifier
     {
         [Header(" [ Modifier ] ")]
         [SerializeField] private MovementSystemComponent _MovementSystemComponent;
