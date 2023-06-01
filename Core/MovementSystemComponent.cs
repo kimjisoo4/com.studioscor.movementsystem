@@ -5,13 +5,99 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
-    public delegate void ChangedMovementHandler(IMovementSystemEvent movementSystem);
+    public delegate void ChangedMovementHandler(IMovementEvent movementSystem);
 
     public static class MovementSystemUtility
     {
-        public static bool TryGetModifier<T>(this IMovementSystem movementSystem, out T movementModifier) where T : IMovementModifier
+        #region Get MovementSystem
+        public static IMovementSystem GetMovementSystem(this GameObject gameObject)
         {
-            foreach (var modifier in movementSystem.Modifiers)
+            return gameObject.GetComponent<IMovementSystem>();
+        }
+        public static IMovementSystem GetMovementSystem(this Component component)
+        {
+            var movementSystem = component as IMovementSystem;
+
+            if (movementSystem is not null)
+                return movementSystem;
+
+            return component.GetComponent<IMovementSystem>();
+        }
+        public static bool TryGetMovementSystem(this GameObject gameObject, out IMovementSystem movementSystem)
+        {
+            return gameObject.TryGetComponent(out movementSystem);
+        }
+        public static bool TryGetMovementSystem(this Component component, out IMovementSystem movementSystem)
+        {
+            movementSystem = component as IMovementSystem;
+
+            if (movementSystem is not null)
+                return true;
+
+            return component.TryGetComponent(out movementSystem);
+        }
+        #endregion
+
+        #region Get MovementEvent
+        public static IMovementEvent GetMovementEvent(this GameObject gameObject)
+        {
+            return gameObject.GetComponent<IMovementEvent>();
+        }
+        public static IMovementEvent GetMovementEvent(this Component component)
+        {
+            var movementSystem = component as IMovementEvent;
+
+            if (movementSystem is not null)
+                return movementSystem;
+
+            return component.GetComponent<IMovementEvent>();
+        }
+        public static bool TryGetMovementEvent(this GameObject gameObject, out IMovementEvent movementEvent)
+        {
+            return gameObject.TryGetComponent(out movementEvent);
+        }
+        public static bool TryGetMovementEvent(this Component component, out IMovementEvent movementEvent)
+        {
+            movementEvent = component as IMovementEvent;
+
+            if (movementEvent is not null)
+                return true;
+
+            return component.TryGetComponent(out movementEvent);
+        }
+        #endregion
+        #region Get Movement Module System
+        public static IMovementModuleSystem GetMovementModuleSystem(this GameObject gameObject)
+        {
+            return gameObject.GetComponent<IMovementModuleSystem>();
+        }
+        public static IMovementModuleSystem GetMovementModuleSystem(this Component component)
+        {
+            var movementSystem = component as IMovementModuleSystem;
+
+            if (movementSystem is not null)
+                return movementSystem;
+
+            return component.GetComponent<IMovementModuleSystem>();
+        }
+        public static bool TryGetMovementModuleSystem(this GameObject gameObject, out IMovementModuleSystem movementModuleSystem)
+        {
+            return gameObject.TryGetComponent(out movementModuleSystem);
+        }
+        public static bool TryGetMovementModuleSystem(this Component component, out IMovementModuleSystem movementModuleSystem)
+        {
+            movementModuleSystem = component as IMovementModuleSystem;
+
+            if (movementModuleSystem is not null)
+                return true;
+
+            return component.TryGetComponent(out movementModuleSystem);
+        }
+        #endregion
+
+        public static bool TryGetModifier<T>(this IMovementModuleSystem movementModuleSystem, out T movementModifier) where T : IMovementModifier
+        {
+            foreach (var modifier in movementModuleSystem.Modifiers)
             {
                 if (modifier.GetType() == typeof(T))
                 {
@@ -26,22 +112,34 @@ namespace StudioScor.MovementSystem
             return false;
         }
     }
+
+    public interface IMovementModuleSystem
+    {
+        public IReadOnlyList<IMovementModifier> Modifiers { get; }
+
+        public void AddModifier(IMovementModifier movementModifier);
+        public void RemoveModifier(IMovementModifier movementModifier);
+    }
+
     public interface IMovementSystem
     {
         public Transform transform { get; }
         public GameObject gameObject { get; }
-        public IReadOnlyList<IMovementModifier> Modifiers { get; }
 
         public float MoveStrength { get; }
         public Vector3 MoveDirection { get; }
         public bool IsGrounded { get; }
         public bool IsMoving { get; }
 
+        public float GroundDistance { get; }
+
         public Vector3 PrevVelocity { get; }
         public Vector3 PrevVelocityXZ { get; }
         public float PrevSpeed { get; }
         public float PrevGravity { get; }
 
+        public void ForceOnGrounded();
+        public void ForceUnGrounded();
         public void SetGrounded(bool isGrounded);
         public void SetGroundState(Vector3 point, Vector3 normal, float distance);
 
@@ -52,7 +150,7 @@ namespace StudioScor.MovementSystem
         public void UpdateMovement(float deltaTime);
     }
 
-    public interface IMovementSystemEvent
+    public interface IMovementEvent
     {
         public event ChangedMovementHandler OnLanded;
         public event ChangedMovementHandler OnJumped;
@@ -62,7 +160,7 @@ namespace StudioScor.MovementSystem
 
     [DefaultExecutionOrder(MovementSystemxcutionOrder.MAIN_ORDER)]
     [AddComponentMenu("StudioScor/MovementSystem/MovementSystem", order : 0)]
-    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem, IMovementSystemEvent
+    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem, IMovementEvent, IMovementModuleSystem
     {
         [Header(" [ Movement System ] ")]
         // Grounded  
@@ -99,6 +197,7 @@ namespace StudioScor.MovementSystem
         protected float _PrevSpeed;
         protected float _PrevGravity;
 
+        private bool shouldSortModifiers = false;
         public abstract Vector3 LastVelocity { get; }
         public bool IsMoving => _IsMoving;
         public Vector3 PrevVelocity => _PrevVelocity;
@@ -151,12 +250,21 @@ namespace StudioScor.MovementSystem
 
         public void AddModifier(IMovementModifier modifier)
         {
+            if (modifier is null || _Modifiers.Contains(modifier))
+                return;
+
             _Modifiers.Add(modifier);
 
-            _Modifiers.Sort(SortModifier);
+            if(_Modifiers.Count >= 2)
+                shouldSortModifiers = true;
+
+            
         }
         public void RemoveModifier(IMovementModifier modifier)
         {
+            if (modifier is null)
+                return;
+
             _Modifiers.Remove(modifier);
         }
 
@@ -237,6 +345,13 @@ namespace StudioScor.MovementSystem
 
         public void UpdateMovement(float deltaTime)
         {
+            if(shouldSortModifiers)
+            {
+                shouldSortModifiers = false;
+
+                _Modifiers.Sort(SortModifier);
+            }
+
             foreach (var modifier in _Modifiers)
             {
                 modifier.ProcessMovement(deltaTime);
@@ -280,7 +395,7 @@ namespace StudioScor.MovementSystem
             Vector3 velocity = LastVelocity;
 
             _PrevVelocity = velocity;
-            _PrevGravity = velocity.y;
+            _PrevGravity = IsGrounded? 0f : velocity.y;
 
             velocity.y = 0;
 

@@ -20,7 +20,7 @@ namespace StudioScor.MovementSystem.VisualScripting
         }
     }
 
-    public abstract class MovementSystemEventUnit : CustomInterfaceEventUnit<IMovementSystemEvent, EmptyEventArgs>
+    public abstract class MovementSystemEventUnit : CustomInterfaceEventUnit<IMovementEvent, EmptyEventArgs>
     {
         public override Type MessageListenerType => typeof(MovementSystemEventListener);
     }

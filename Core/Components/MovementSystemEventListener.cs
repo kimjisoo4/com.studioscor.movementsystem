@@ -14,7 +14,7 @@ namespace StudioScor.MovementSystem
         [SerializeField] private UnityEvent _OnInvokedEvent;
         public event UnityAction OnInvokeEvent;
 
-        private IMovementSystemEvent _MovementSystemEvent;
+        private IMovementEvent _MovementSystemEvent;
 
         private void Awake()
         {
@@ -72,7 +72,7 @@ namespace StudioScor.MovementSystem
             }
         }
 
-        private void MovementSystemEvent_Invoked(IMovementSystemEvent movementSystem)
+        private void MovementSystemEvent_Invoked(IMovementEvent movementSystem)
         {
             Log($" On Invoked Event [ {_Type} Event ]");
 

@@ -3,6 +3,7 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
+
     public class MovePositionToCurve : BaseMonoBehaviour
     {
         [Header(" [ Add Position To Curve ] ")]

@@ -9,7 +9,7 @@ namespace StudioScor.MovementSystem
     }
 
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Gravity Modifier", order: 10)]
-    public class GravityModifier : MovementModifier, IGravityModifier
+    public class GravityModifier : MovementModifierComponent, IGravityModifier
     {
         [Header(" [ Gravity Movement ] ")]
         [SerializeField] private float _Gravity = 9.81f;
@@ -26,9 +26,9 @@ namespace StudioScor.MovementSystem
             _Gravity = newGravity;
         }
 
-        public override void ProcessMovement(float deltaTime)
+        protected override void UpdateMovement(float deltaTime)
         {
-            if (MovementSystem.IsGrounded || MovementSystem.WasGrounded)
+            if (MovementSystem.IsGrounded)
                 return;
 
             float gravity = MovementSystem.PrevGravity;

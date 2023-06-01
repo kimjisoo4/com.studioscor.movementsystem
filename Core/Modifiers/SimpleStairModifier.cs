@@ -3,7 +3,7 @@
 namespace StudioScor.MovementSystem
 {
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Simple Stair Modifier", order: 25)]
-    public class SimpleStairModifier : MovementModifier
+    public class SimpleStairModifier : MovementModifierComponent
     {
         [Header(" [ Simple Stair Movement ] ")]
         [SerializeField] private float _Gravity = 9.81f;
@@ -16,16 +16,10 @@ namespace StudioScor.MovementSystem
             _UpdateType = EMovementUpdateType.Late;
         }
 
-        public override void ProcessMovement(float deltaTime)
+        protected override void UpdateMovement(float deltaTime)
         {
-            if (MovementSystem.IsGrounded && MovementSystem.WasGrounded)
-            {
+            if (MovementSystem.IsGrounded)
                 MovementSystem.AddVelocity(transform.up * -_Gravity);
-            }
-            else if (MovementSystem.IsGrounded)
-            {
-                MovementSystem.AddVelocity(transform.up * (-_Gravity * 0.1f));
-            }
         }
     }
 

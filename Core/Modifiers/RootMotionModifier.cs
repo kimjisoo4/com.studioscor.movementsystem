@@ -3,7 +3,7 @@ using StudioScor.Utilities;
 namespace StudioScor.MovementSystem
 {
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/RootMotion Modifier", order: 30)]
-    public class RootMotionModifier : MovementModifier
+    public class RootMotionModifier : MovementModifierComponent
     {
         [Header(" [ Root Motion Modifier ] ")]
         [SerializeField] private Animator _Animator;
@@ -16,7 +16,7 @@ namespace StudioScor.MovementSystem
             gameObject.TryGetComponentInParentOrChildren(out _Animator);
         }
 
-        private void Awake()
+        protected override void Awake()
         {
             if(!_Animator)
             {
@@ -27,7 +27,7 @@ namespace StudioScor.MovementSystem
             }
         }
 
-        public override void ProcessMovement(float deltaTime)
+        protected override void UpdateMovement(float deltaTime)
         {
             MovementSystem.MovePosition(_RootPosition);
         }

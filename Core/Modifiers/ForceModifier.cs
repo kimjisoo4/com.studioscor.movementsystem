@@ -4,10 +4,10 @@ using StudioScor.Utilities;
 namespace StudioScor.MovementSystem
 {
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Force Modifier", order: 30)]
-    public class ForceModifier : MovementModifier
+    public class ForceModifier : MovementModifierComponent
     {
         #region Event
-        public delegate void ForceModifierEventHandler(MovementSystemComponent movementSystem, ForceModifier forceModifier);
+        public delegate void ForceModifierEventHandler(IMovementSystem movementSystem, ForceModifier forceModifier);
         #endregion
 
         [Header(" [ Decelerate Modifier ] ")]
@@ -96,7 +96,7 @@ namespace StudioScor.MovementSystem
             return force;
         }
 
-        public override void ProcessMovement(float deltaTime)
+        protected override void UpdateMovement(float deltaTime)
         {
             if (!_IsRemainForce)
                 return;

@@ -8,14 +8,12 @@ namespace StudioScor.MovementSystem
     }
 
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Stair Modifier", order: 20)]
-    public class StairModifier : MovementModifier
+    public class StairModifier : MovementModifierComponent, IStairModifier
     {
-        public override void ProcessMovement(float deltaTime)
+        protected override void UpdateMovement(float deltaTime)
         {
-            if (MovementSystem.IsGrounded && MovementSystem.WasGrounded)
-            {
+            if (MovementSystem.IsGrounded)
                 MovementSystem.MovePosition(transform.up * -MovementSystem.GroundDistance);
-            }
         }
     }
 
