@@ -169,7 +169,7 @@ namespace StudioScor.MovementSystem
                 case ETransformSpece.MoveDirection:
                     _MoveDirection = _MovementSystem.MoveDirection;
 
-                    if (_Direction.SafeEqauls(Vector3.zero))
+                    if (_Direction.SafeEquals(Vector3.zero))
                         _MoveDirection = _Direction;
                     break;
 

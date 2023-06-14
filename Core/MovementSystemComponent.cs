@@ -154,8 +154,12 @@ namespace StudioScor.MovementSystem
     {
         public event ChangedMovementHandler OnLanded;
         public event ChangedMovementHandler OnJumped;
+        
         public event ChangedMovementHandler OnStartedMovement;
         public event ChangedMovementHandler OnFinishedMovement;
+
+        public event ChangedMovementHandler OnStartedInput;
+        public event ChangedMovementHandler OnFinishedInput;
     }
 
     [DefaultExecutionOrder(MovementSystemxcutionOrder.MAIN_ORDER)]
@@ -211,6 +215,8 @@ namespace StudioScor.MovementSystem
         public event ChangedMovementHandler OnJumped;
         public event ChangedMovementHandler OnStartedMovement;
         public event ChangedMovementHandler OnFinishedMovement;
+        public event ChangedMovementHandler OnStartedInput;
+        public event ChangedMovementHandler OnFinishedInput;
 
         private void Awake()
         {
@@ -228,10 +234,17 @@ namespace StudioScor.MovementSystem
         {
             Log("Move Direction - " + direction + " Strength - " + strength.ToString("N1"));
 
+            float prevStrength = _MoveStrength;
+            
             if (direction == Vector3.zero)
             {
                 _MoveDirection = default;
                 _MoveStrength = 0;
+
+                if (prevStrength > 0f)
+                {
+                    Callback_OnFinishedInput();
+                }
             }
             else
             {
@@ -244,6 +257,11 @@ namespace StudioScor.MovementSystem
                 else
                 {
                     _MoveStrength = Mathf.Clamp01(strength);
+                }
+
+                if (prevStrength <= 0f)
+                {
+                    Callback_OnStartedInput();
                 }
             }
         }
@@ -444,6 +462,18 @@ namespace StudioScor.MovementSystem
             Log("Finished Movement");
 
             OnFinishedMovement?.Invoke(this);
+        }
+        protected void Callback_OnStartedInput()
+        {
+            Log("Started Input");
+
+            OnStartedInput?.Invoke(this);
+        }
+        protected void Callback_OnFinishedInput()
+        {
+            Log("Finished Input");
+
+            OnFinishedInput?.Invoke(this);
         }
         #endregion
     }

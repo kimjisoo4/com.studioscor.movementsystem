@@ -269,7 +269,7 @@ namespace StudioScor.MovementSystem
         }
         private void CalcRotateToMoveDirection()
         {
-            if (_MovementSystem.MoveDirection.SafeEqauls(Vector3.zero))
+            if (_MovementSystem.MoveDirection.SafeEquals(Vector3.zero))
             {
                 CalcRotateToLocal();
 
@@ -281,7 +281,7 @@ namespace StudioScor.MovementSystem
 
         private void CalcRotateToWolrd()
         {
-            if (_Direction.SafeEqauls(Vector3.zero))
+            if (_Direction.SafeEquals(Vector3.zero))
             {
                 CalcRotateToLocal();
 
@@ -292,7 +292,7 @@ namespace StudioScor.MovementSystem
         }
         private void CalcRotateToScript()
         {
-            if (_InputDirection.SafeEqauls(Vector3.zero))
+            if (_InputDirection.SafeEquals(Vector3.zero))
             {
                 CalcRotateToLocal();
 
