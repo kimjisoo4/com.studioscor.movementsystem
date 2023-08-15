@@ -37,7 +37,6 @@ namespace StudioScor.MovementSystem
             return component.TryGetComponent(out movementSystem);
         }
         #endregion
-
         #region Get MovementEvent
         public static IMovementEvent GetMovementEvent(this GameObject gameObject)
         {
@@ -168,47 +167,47 @@ namespace StudioScor.MovementSystem
     {
         [Header(" [ Movement System ] ")]
         // Grounded  
-        private bool _IsGrounded;
-        private bool _WasGrounded;
-        private float _GroundDistance;
-        private Vector3 _GroundPoint;
-        private Vector3 _GroundNormal;
-        public bool IsGrounded => _IsGrounded;
-        public bool WasGrounded => _WasGrounded;
-        public float GroundDistance => _GroundDistance;
-        public Vector3 GroundPoint => _GroundPoint;
-        public Vector3 GroundNormal => _GroundNormal;
+        private bool isGrounded;
+        private bool wasGrounded;
+        private float groundDistance;
+        private Vector3 groundPoint;
+        private Vector3 groundNormal;
+        public bool IsGrounded => isGrounded;
+        public bool WasGrounded => wasGrounded;
+        public float GroundDistance => groundDistance;
+        public Vector3 GroundPoint => groundPoint;
+        public Vector3 GroundNormal => groundNormal;
 
         // Modifier
-        protected readonly List<IMovementModifier> _Modifiers = new();
+        protected readonly List<IMovementModifier> modifiers = new();
 
         // Input
-        protected Vector3 _MoveDirection;
-        protected float _MoveStrength;
-        public Vector3 MoveDirection => _MoveDirection;
-        public float MoveStrength => _MoveStrength;
+        protected Vector3 moveDirection;
+        protected float moveStrength;
+        public Vector3 MoveDirection => moveDirection;
+        public float MoveStrength => moveStrength;
 
-        protected Vector3 _AddVelocity;
-        protected Vector3 _AddPosition;
+        protected Vector3 addVelocity;
+        protected Vector3 addPosition;
 
-        protected Vector3 Velocity => _AddVelocity;
-        protected Vector3 Position => _AddPosition;
+        protected Vector3 Velocity => addVelocity;
+        protected Vector3 Position => addPosition;
 
         // State
-        protected bool _IsMoving;
-        protected Vector3 _PrevVelocity;
-        protected Vector3 _PrevVelocityXZ;
-        protected float _PrevSpeed;
-        protected float _PrevGravity;
+        protected bool isMoving;
+        protected Vector3 prevVelocity;
+        protected Vector3 prevVelocityXZ;
+        protected float prevSpeed;
+        protected float prevGravity;
 
         private bool shouldSortModifiers = false;
         public abstract Vector3 LastVelocity { get; }
-        public bool IsMoving => _IsMoving;
-        public Vector3 PrevVelocity => _PrevVelocity;
-        public Vector3 PrevVelocityXZ => _PrevVelocityXZ;
-        public float PrevSpeed => _PrevSpeed;
-        public float PrevGravity => _PrevGravity;
-        public IReadOnlyList<IMovementModifier> Modifiers => _Modifiers;
+        public bool IsMoving => isMoving;
+        public Vector3 PrevVelocity => prevVelocity;
+        public Vector3 PrevVelocityXZ => prevVelocityXZ;
+        public float PrevSpeed => prevSpeed;
+        public float PrevGravity => prevGravity;
+        public IReadOnlyList<IMovementModifier> Modifiers => modifiers;
 
         // Events
         public event ChangedMovementHandler OnLanded;
@@ -234,12 +233,12 @@ namespace StudioScor.MovementSystem
         {
             Log("Move Direction - " + direction + " Strength - " + strength.ToString("N1"));
 
-            float prevStrength = _MoveStrength;
+            float prevStrength = moveStrength;
             
             if (direction == Vector3.zero)
             {
-                _MoveDirection = default;
-                _MoveStrength = 0;
+                moveDirection = default;
+                moveStrength = 0;
 
                 if (prevStrength > 0f)
                 {
@@ -248,15 +247,15 @@ namespace StudioScor.MovementSystem
             }
             else
             {
-                _MoveDirection = direction;
+                moveDirection = direction;
 
                 if (strength < 0)
                 {
-                    _MoveStrength = 1;
+                    moveStrength = 1;
                 }
                 else
                 {
-                    _MoveStrength = Mathf.Clamp01(strength);
+                    moveStrength = Mathf.Clamp01(strength);
                 }
 
                 if (prevStrength <= 0f)
@@ -268,12 +267,12 @@ namespace StudioScor.MovementSystem
 
         public void AddModifier(IMovementModifier modifier)
         {
-            if (modifier is null || _Modifiers.Contains(modifier))
+            if (modifier is null || modifiers.Contains(modifier))
                 return;
 
-            _Modifiers.Add(modifier);
+            modifiers.Add(modifier);
 
-            if(_Modifiers.Count >= 2)
+            if(modifiers.Count >= 2)
                 shouldSortModifiers = true;
 
             
@@ -283,7 +282,7 @@ namespace StudioScor.MovementSystem
             if (modifier is null)
                 return;
 
-            _Modifiers.Remove(modifier);
+            modifiers.Remove(modifier);
         }
 
         private int SortModifier(IMovementModifier lhs, IMovementModifier rhs)
@@ -300,19 +299,19 @@ namespace StudioScor.MovementSystem
         
         public void AddVelocity(Vector3 velocity)
         {
-            _AddVelocity += velocity;
+            addVelocity += velocity;
         }
         public void MovePosition(Vector3 addPosition)
         {
-            _AddPosition += addPosition;
+            this.addPosition += addPosition;
         }
 
         public void ForceOnGrounded()
         {
-            bool prevGrounded = _IsGrounded;
+            bool prevGrounded = isGrounded;
 
-            _WasGrounded = true;
-            _IsGrounded = true;
+            wasGrounded = true;
+            isGrounded = true;
 
             if (!prevGrounded)
             {
@@ -322,10 +321,10 @@ namespace StudioScor.MovementSystem
         }
         public void ForceUnGrounded()
         {
-            bool prevGrounded = _IsGrounded;
+            bool prevGrounded = isGrounded;
 
-            _WasGrounded = false;
-            _IsGrounded = false;
+            wasGrounded = false;
+            isGrounded = false;
 
             SetGroundState(Vector3.zero, Vector3.up, 0f);
 
@@ -337,10 +336,10 @@ namespace StudioScor.MovementSystem
         }
         public void SetGrounded(bool isGrounded)
         {
-            _WasGrounded = _IsGrounded;
-            _IsGrounded = isGrounded;
+            wasGrounded = this.isGrounded;
+            this.isGrounded = isGrounded;
 
-            if (_WasGrounded == _IsGrounded)
+            if (wasGrounded == this.isGrounded)
                 return;
 
             if (IsGrounded)
@@ -356,9 +355,9 @@ namespace StudioScor.MovementSystem
         }
         public void SetGroundState(Vector3 point, Vector3 normal, float distance)
         {
-            _GroundPoint = point;
-            _GroundNormal = normal;
-            _GroundDistance = distance;
+            groundPoint = point;
+            groundNormal = normal;
+            groundDistance = distance;
         }
 
         public void UpdateMovement(float deltaTime)
@@ -367,10 +366,10 @@ namespace StudioScor.MovementSystem
             {
                 shouldSortModifiers = false;
 
-                _Modifiers.Sort(SortModifier);
+                modifiers.Sort(SortModifier);
             }
 
-            foreach (var modifier in _Modifiers)
+            foreach (var modifier in modifiers)
             {
                 modifier.ProcessMovement(deltaTime);
             }
@@ -384,22 +383,22 @@ namespace StudioScor.MovementSystem
 
         protected void ResetVelocity()
         {
-            _AddVelocity = default;
-            _AddPosition = default;
+            addVelocity = default;
+            addPosition = default;
         }
 
         protected void CheckMoving()
         {
-            if (_IsMoving && PrevSpeed == 0)
+            if (isMoving && PrevSpeed == 0)
             {
-                _IsMoving = false;
+                isMoving = false;
 
                 OnFinishMovement();
                 Callback_OnFinishdMovement();
             }
-            else if (!_IsMoving && PrevSpeed > 0)
+            else if (!isMoving && PrevSpeed > 0)
             {
-                _IsMoving = true;
+                isMoving = true;
 
                 OnStartMovement();
                 Callback_OnStartedMovement();
@@ -412,13 +411,13 @@ namespace StudioScor.MovementSystem
         {
             Vector3 velocity = LastVelocity;
 
-            _PrevVelocity = velocity;
-            _PrevGravity = IsGrounded? 0f : velocity.y;
+            prevVelocity = velocity;
+            prevGravity = IsGrounded? 0f : velocity.y;
 
             velocity.y = 0;
 
-            _PrevVelocityXZ = velocity;
-            _PrevSpeed = _PrevVelocityXZ.magnitude;
+            prevVelocityXZ = velocity;
+            prevSpeed = prevVelocityXZ.magnitude;
         }
 
         protected virtual void OnLand()

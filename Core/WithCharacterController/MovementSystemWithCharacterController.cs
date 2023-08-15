@@ -36,11 +36,11 @@ namespace StudioScor.MovementSystem
 
         protected override void OnMovement(float deltaTime)
         {
-            _LastVelocity = _AddVelocity;
+            _LastVelocity = addVelocity;
 
-            if(_AddPosition != default)
+            if(addPosition != default)
             {
-                _LastVelocity += _AddPosition.SafeDivide(deltaTime);
+                _LastVelocity += addPosition.SafeDivide(deltaTime);
             }
 
             _CharacterController.Move(_LastVelocity * deltaTime);
