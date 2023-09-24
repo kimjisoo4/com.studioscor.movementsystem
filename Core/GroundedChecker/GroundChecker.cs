@@ -5,6 +5,10 @@ namespace StudioScor.MovementSystem
 {
     public interface IGroundChecker
     {
+        #region Event
+        public delegate void ChangedGroundedStateHandler(GroundChecker groundChecker, bool isGrounded);
+        #endregion
+
         public void SetGrounded(bool isGrounded);
         public void CheckGrounded();
 
@@ -13,15 +17,13 @@ namespace StudioScor.MovementSystem
         public Vector3 Normal { get; }
         public Vector3 Point { get; }
         public float Distance { get; }
+
+        public event ChangedGroundedStateHandler OnChangedGroundedState;
     }
 
     [AddComponentMenu("StudioScor/MovementSystem/GroundChecker", order: 0)]
     public abstract class GroundChecker : BaseMonoBehaviour, IGroundChecker
     {
-        #region Event
-        public delegate void ChangedGroundedStateHandler(GroundChecker groundChecker, bool isGrounded);
-        #endregion
-
         [Header(" [ Ground Checker ] ")]
         protected Vector3 _Normal;
         protected Vector3 _Point;
@@ -36,7 +38,7 @@ namespace StudioScor.MovementSystem
         public Vector3 Point => _Point;
         public float Distance => _Distance;
 
-        public event ChangedGroundedStateHandler OnChangedGroundedState;
+        public event IGroundChecker.ChangedGroundedStateHandler OnChangedGroundedState;
 
         private void Awake()
         {
