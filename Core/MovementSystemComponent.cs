@@ -5,7 +5,7 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
-    public delegate void ChangedMovementHandler(IMovementEvent movementSystem);
+    public delegate void ChangedMovementHandler(IMovementSystem movementSystem);
 
     public static class MovementSystemUtility
     {
@@ -37,34 +37,6 @@ namespace StudioScor.MovementSystem
             return component.TryGetComponent(out movementSystem);
         }
         #endregion
-        #region Get MovementEvent
-        public static IMovementEvent GetMovementEvent(this GameObject gameObject)
-        {
-            return gameObject.GetComponent<IMovementEvent>();
-        }
-        public static IMovementEvent GetMovementEvent(this Component component)
-        {
-            var movementSystem = component as IMovementEvent;
-
-            if (movementSystem is not null)
-                return movementSystem;
-
-            return component.GetComponent<IMovementEvent>();
-        }
-        public static bool TryGetMovementEvent(this GameObject gameObject, out IMovementEvent movementEvent)
-        {
-            return gameObject.TryGetComponent(out movementEvent);
-        }
-        public static bool TryGetMovementEvent(this Component component, out IMovementEvent movementEvent)
-        {
-            movementEvent = component as IMovementEvent;
-
-            if (movementEvent is not null)
-                return true;
-
-            return component.TryGetComponent(out movementEvent);
-        }
-        #endregion
         #region Get Movement Module System
         public static IMovementModuleSystem GetMovementModuleSystem(this GameObject gameObject)
         {
@@ -91,6 +63,35 @@ namespace StudioScor.MovementSystem
                 return true;
 
             return component.TryGetComponent(out movementModuleSystem);
+        }
+        #endregion
+        #region Get Ground Checker
+
+        public static IGroundChecker GetGroundChecker(this GameObject gameObject)
+        {
+            return gameObject.GetComponent<IGroundChecker>();
+        }
+        public static IGroundChecker GetGroundChecker(this Component component)
+        {
+            var groundChecker = component as IGroundChecker;
+
+            if (groundChecker is not null)
+                return groundChecker;
+
+            return component.GetComponent<IGroundChecker>();
+        }
+        public static bool TryGetGroundChecker(this GameObject gameObject, out IGroundChecker groundChecker)
+        {
+            return gameObject.TryGetComponent(out groundChecker);
+        }
+        public static bool TryGetGroundChecker(this Component component, out IGroundChecker groundChecker)
+        {
+            groundChecker = component as IGroundChecker;
+
+            if (groundChecker is not null)
+                return true;
+
+            return component.TryGetComponent(out groundChecker);
         }
         #endregion
 
@@ -147,13 +148,10 @@ namespace StudioScor.MovementSystem
         public void MovePosition(Vector3 position);
         public void Teleport(Vector3 position = default);
         public void UpdateMovement(float deltaTime);
-    }
 
-    public interface IMovementEvent
-    {
         public event ChangedMovementHandler OnLanded;
         public event ChangedMovementHandler OnJumped;
-        
+
         public event ChangedMovementHandler OnStartedMovement;
         public event ChangedMovementHandler OnFinishedMovement;
 
@@ -161,9 +159,10 @@ namespace StudioScor.MovementSystem
         public event ChangedMovementHandler OnFinishedInput;
     }
 
+
     [DefaultExecutionOrder(MovementSystemxcutionOrder.MAIN_ORDER)]
     [AddComponentMenu("StudioScor/MovementSystem/MovementSystem", order : 0)]
-    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem, IMovementEvent, IMovementModuleSystem
+    public abstract class MovementSystemComponent : BaseMonoBehaviour, IMovementSystem, IMovementModuleSystem
     {
         [Header(" [ Movement System ] ")]
         // Grounded  
