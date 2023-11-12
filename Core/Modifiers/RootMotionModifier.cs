@@ -22,7 +22,7 @@ namespace StudioScor.MovementSystem
             {
                 if(!gameObject.TryGetComponentInParentOrChildren(out _Animator))
                 {
-                    Log("Animator Is NULL!!", true);
+                    LogError("Animator Is NULL!!");
                 }
             }
         }

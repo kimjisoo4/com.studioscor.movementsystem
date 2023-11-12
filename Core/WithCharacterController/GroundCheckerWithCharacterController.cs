@@ -54,7 +54,7 @@ namespace StudioScor.MovementSystem
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out characterController))
                 {
-                    Log($"{nameof(characterController)} is NULL!!", true);
+                    LogError($"{nameof(characterController)} is NULL!!");
                 }
             }
         }

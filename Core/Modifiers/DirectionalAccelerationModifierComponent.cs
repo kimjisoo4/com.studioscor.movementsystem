@@ -18,14 +18,14 @@ namespace StudioScor.MovementSystem
         protected readonly IMovementSystem movementSystem;
         protected readonly IMovementModuleSystem moduleSystem;
 
-        [Header(" [ Debug ] ")]
-        [SerializeField] private bool useDebug = false;
-
         private bool isPlaying = false;
-        public override Object Context => movementSystem.gameObject;
         public EMovementUpdateType UpdateType => updateType;
-
         public bool IsPlaying => isPlaying;
+
+#if UNITY_EDITOR
+        protected override Object Context => movementSystem.gameObject;
+#endif
+
         public MovementModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem)
         {
             this.movementSystem = movementSystem;

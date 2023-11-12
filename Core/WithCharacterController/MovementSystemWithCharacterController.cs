@@ -29,7 +29,7 @@ namespace StudioScor.MovementSystem
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out _CharacterController))
                 {
-                    Log("Character Contollre Is NULL", true);
+                    LogError("Character Contollre Is NULL");
                 }
             }
         }

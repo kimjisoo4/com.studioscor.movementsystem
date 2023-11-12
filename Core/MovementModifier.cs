@@ -39,7 +39,7 @@ namespace StudioScor.MovementSystem
 
             if (movementModuleSystem is null)
             {
-                Log(" Movement System is NULL", true);
+                LogError(" Movement System is NULL");
 
                 return;
             }

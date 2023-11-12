@@ -37,35 +37,35 @@ namespace StudioScor.MovementSystem
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out _MovementSystem))
                 {
-                    Log("Movement System Is NULL!", true);
+                    LogError("Movement System Is NULL!");
                 }
             }
             if (!_GroundChecker)
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out _GroundChecker))
                 {
-                    Log("Ground Checker Is NULL!", true);
+                    LogError("Ground Checker Is NULL!");
                 }
             }
             if (!_DirectionalModifier)
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out _DirectionalModifier))
                 {
-                    Log("Directional Modifier Is NULL!", true);
+                    LogError("Directional Modifier Is NULL!");
                 }
             }
             if (!_GravityModifier)
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out _GravityModifier))
                 {
-                    Log("Gravity Modifier Is NULL!", true);
+                    LogError("Gravity Modifier Is NULL!");
                 }
             }
             if (!_ForceModifier)
             {
                 if (!gameObject.TryGetComponentInParentOrChildren(out _ForceModifier))
                 {
-                    Log("Force Modifier Is NULL!", true);
+                    LogError("Force Modifier Is NULL!");
                 }
             }
         }
