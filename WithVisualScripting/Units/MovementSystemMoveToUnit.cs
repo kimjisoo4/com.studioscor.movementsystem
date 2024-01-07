@@ -184,10 +184,6 @@ namespace StudioScor.MovementSystem.VisualScripting
         public ValueInput MovementSystem { get; private set; }
 
         [DoNotSerialize]
-        [PortLabel("Finished")]
-        public ControlOutput Finished { get; private set; }
-
-        [DoNotSerialize]
         [PortLabel("Position")]
         [PortLabelHidden]
         public ValueInput Position { get; private set; }
@@ -210,7 +206,6 @@ namespace StudioScor.MovementSystem.VisualScripting
         {
             base.Definition();
 
-            Finished = ControlOutput(nameof(Finished));
             MovementSystem = ValueInput<MovementSystemComponent>(nameof(MovementSystem), null).NullMeansSelf();
 
             Position = ValueInput<Vector3>(nameof(Position), default);

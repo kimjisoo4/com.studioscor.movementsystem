@@ -23,7 +23,7 @@ namespace StudioScor.MovementSystem
         public bool IsPlaying => isPlaying;
 
 #if UNITY_EDITOR
-        protected override Object Context => movementSystem.gameObject;
+        public override Object Context => movementSystem.gameObject;
 #endif
 
         public MovementModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem)
