@@ -18,7 +18,7 @@ namespace StudioScor.MovementSystem
 
         [Header(" [ Modifiers ] ")]
         [SerializeField] private DirectionalAccelerationModifierComponent _DirectionalModifier;
-        [SerializeField] private GravityModifier _GravityModifier;
+        [SerializeField] private GravityModifierComponent _GravityModifier;
         [SerializeField] private ForceModifier _ForceModifier;
 
         private void Reset()

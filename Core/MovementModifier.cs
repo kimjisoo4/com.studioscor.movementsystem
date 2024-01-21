@@ -8,17 +8,17 @@ namespace StudioScor.MovementSystem
     public abstract class MovementModifierComponent : BaseMonoBehaviour, IMovementModifier
     {
         [Header(" [ Modifier ] ")]
-        [SerializeField] private GameObject owner;
+        [SerializeField] private GameObject _Owner;
         [SerializeField] protected EMovementUpdateType _UpdateType = EMovementUpdateType.Default;
-        public GameObject Owner => owner;
+        public GameObject Owner => _Owner;
 
         private bool isPlaying = false;
 
-        private IMovementSystem movementSystem;
-        private IMovementModuleSystem movementModuleSystem;
+        private IMovementSystem _MovementSystem;
+        private IMovementModuleSystem _MovementModuleSystem;
 
-        protected IMovementSystem MovementSystem => movementSystem;
-        protected IMovementModuleSystem MovementModuleSystem => movementModuleSystem;
+        protected IMovementSystem MovementSystem => _MovementSystem;
+        protected IMovementModuleSystem MovementModuleSystem => _MovementModuleSystem;
         public EMovementUpdateType UpdateType => _UpdateType;
         public bool IsPlaying => isPlaying;
 
@@ -28,31 +28,31 @@ namespace StudioScor.MovementSystem
             {
                 var component = moduleSystem as Component;
 
-                owner = component.gameObject;
+                _Owner = component.gameObject;
             }
         }
 
         protected virtual void Awake()
         {
-            movementModuleSystem = owner.GetMovementModuleSystem();
-            movementSystem = owner.GetMovementSystem();
+            _MovementModuleSystem = _Owner.GetMovementModuleSystem();
+            _MovementSystem = _Owner.GetMovementSystem();
 
-            if (movementModuleSystem is null)
+            if (_MovementModuleSystem is null)
             {
                 LogError(" Movement System is NULL");
 
                 return;
             }
 
-            movementModuleSystem.AddModifier(this);
+            _MovementModuleSystem.AddModifier(this);
         }
 
         private void OnDestroy()
         {
-            if (movementModuleSystem is null)
+            if (_MovementModuleSystem is null)
                 return;
 
-            movementModuleSystem.RemoveModifier(this);
+            _MovementModuleSystem.RemoveModifier(this);
         }
 
         private void OnEnable()

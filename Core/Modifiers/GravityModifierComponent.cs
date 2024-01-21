@@ -9,7 +9,7 @@ namespace StudioScor.MovementSystem
     }
 
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/Gravity Modifier", order: 10)]
-    public class GravityModifier : MovementModifierComponent, IGravityModifier
+    public class GravityModifierComponent : MovementModifierComponent, IGravityModifier
     {
         [Header(" [ Gravity Movement ] ")]
         [SerializeField] private float _Gravity = 9.81f;
@@ -40,8 +40,36 @@ namespace StudioScor.MovementSystem
 
             MovementSystem.AddVelocity(Vector3.up * gravity);
         }
+    }
 
-        
+    public class GravityModifier : MovementModifier, IGravityModifier
+    {
+        [Header(" [ Gravity Movement ] ")]
+        [SerializeField] private float _Gravity = 9.81f;
+
+        public GravityModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem) : base(movementSystem, moduleSystem)
+        {
+        }
+
+        public void SetGravity(float newGravity)
+        {
+            _Gravity = newGravity;
+        }
+
+        protected override void UpdateMovement(float deltaTime)
+        {
+            if (_MovementSystem.IsGrounded)
+                return;
+
+            float gravity = _MovementSystem.PrevGravity;
+
+            if (gravity.IsPositive())
+                gravity = 0f;
+
+            gravity -= _Gravity * deltaTime;
+
+            _MovementSystem.AddVelocity(Vector3.up * gravity);
+        }
     }
 
 }
