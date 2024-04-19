@@ -1,9 +1,6 @@
 using StudioScor.Utilities;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace StudioScor.MovementSystem
 {
@@ -15,7 +12,7 @@ namespace StudioScor.MovementSystem
 #if SCOR_ENABLE_SERIALIZEREFERENCE
         [SerializeReferenceDropdown]
 #endif
-        private IDirectionModule _direction = new LocalDirectionVariable(Vector3.forward);
+        private IDirectionVariable _direction = new LocalDirectionVariable(Vector3.forward);
 
         [SerializeReference]
 #if SCOR_ENABLE_SERIALIZEREFERENCE
@@ -24,9 +21,11 @@ namespace StudioScor.MovementSystem
         private IFloatVariable _distance = new DefaultFloatVariable(5f);
         [SerializeField] private AnimationCurve _curve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
-        private Vector3 Direction => _direction.GetDirection();
+        private Vector3 Direction => _direction.GetValue();
         private float Distance => _original is not null ? _original._distance.GetValue() : _distance.GetValue();
         private AnimationCurve Curve => _original is null ? _curve : _original._curve;
+
+        public bool IsFixedUpdate => false;
 
         private Vector3 _moveDirection;
 
@@ -39,7 +38,7 @@ namespace StudioScor.MovementSystem
             var copy = new ReachMovementActionTask();
 
             copy._original = this;
-            copy._direction = this._direction;
+            copy._direction = _direction.Clone() as IDirectionVariable;
 
             return copy;
         }
