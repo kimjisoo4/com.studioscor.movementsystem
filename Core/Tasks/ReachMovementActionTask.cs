@@ -5,7 +5,7 @@ using UnityEngine;
 namespace StudioScor.MovementSystem
 {
     [Serializable]
-    public class ReachMovementActionTask : ActionTask, ISubActionTask
+    public class ReachMovementActionTask : Task, ISubTask
     {
         [Header(" [ Reach Movement Ability Task ] ")]
         [SerializeReference]
@@ -21,26 +21,25 @@ namespace StudioScor.MovementSystem
         private IFloatVariable _distance = new DefaultFloatVariable(5f);
         [SerializeField] private AnimationCurve _curve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
-        private Vector3 Direction => _direction.GetValue();
-        private float Distance => _original is not null ? _original._distance.GetValue() : _distance.GetValue();
         private AnimationCurve Curve => _original is null ? _curve : _original._curve;
-
         public bool IsFixedUpdate => false;
 
         private Vector3 _moveDirection;
+        private float _moveDistance;
 
         private IMovementSystem _movementSystem;
         private readonly ReachValueToTime _reachValueToTime = new();
         private ReachMovementActionTask _original;
 
-        public override IActionTask Clone()
+        public override ITask Clone()
         {
-            var copy = new ReachMovementActionTask();
+            var clone = new ReachMovementActionTask();
 
-            copy._original = this;
-            copy._direction = _direction.Clone() as IDirectionVariable;
+            clone._original = this;
+            clone._direction = _direction.Clone();
+            clone._distance = _distance.Clone();
 
-            return copy;
+            return clone;
         }
         protected override void SetupTask()
         {
@@ -49,13 +48,16 @@ namespace StudioScor.MovementSystem
             _movementSystem = Owner.GetMovementSystem();
 
             _direction.Setup(Owner);
+            _distance.Setup(Owner);
         }
         protected override void EnterTask()
         {
             base.EnterTask();
 
-            _moveDirection = Direction;
-            _reachValueToTime.OnMovement(Distance, Curve);
+            _moveDirection = _direction.GetValue();
+            _moveDistance = _distance.GetValue();
+
+            _reachValueToTime.OnMovement(_moveDistance, Curve);
         }
 
         protected override void ExitTask()
