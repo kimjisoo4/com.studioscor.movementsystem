@@ -20,12 +20,13 @@ namespace StudioScor.MovementSystem
 #endif
         private IFloatVariable _distance = new DefaultFloatVariable(5f);
         [SerializeField] private AnimationCurve _curve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-
-        private AnimationCurve Curve => _original is null ? _curve : _original._curve;
+        [SerializeField] private bool _updatableDirection = false;
         public bool IsFixedUpdate => false;
 
         private Vector3 _moveDirection;
         private float _moveDistance;
+        private bool _updatable;
+        private AnimationCurve _animationCurve;
 
         private IMovementSystem _movementSystem;
         private readonly ReachValueToTime _reachValueToTime = new();
@@ -56,8 +57,10 @@ namespace StudioScor.MovementSystem
 
             _moveDirection = _direction.GetValue();
             _moveDistance = _distance.GetValue();
+            _animationCurve = _original is null ? _curve : _original._curve;
+            _updatable = _original is null ? _updatableDirection : _original._updatableDirection;
 
-            _reachValueToTime.OnMovement(_moveDistance, Curve);
+            _reachValueToTime.OnMovement(_moveDistance, _animationCurve);
         }
 
         protected override void ExitTask()
@@ -68,9 +71,18 @@ namespace StudioScor.MovementSystem
         }
         public void UpdateSubTask(float normalizedTime)
         {
+            if (_updatable)
+            {
+                _moveDirection = _direction.GetValue();
+            }
+
             float speed = _reachValueToTime.UpdateMovement(normalizedTime);
 
             _movementSystem.MovePosition(_moveDirection * speed);
+        }
+        public void FixedUpdateSubTask(float normalizedTime)
+        {
+            return;
         }
     }
 
