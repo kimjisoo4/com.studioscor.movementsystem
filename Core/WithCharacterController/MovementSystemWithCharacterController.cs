@@ -3,7 +3,6 @@ using StudioScor.Utilities;
 
 namespace StudioScor.MovementSystem
 {
-
     [AddComponentMenu("StudioScor/MovementSystem/Movement System With CharacterController", order:0)]
     public class MovementSystemWithCharacterController : MovementSystemComponent
     {

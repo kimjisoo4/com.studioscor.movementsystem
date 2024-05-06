@@ -388,14 +388,14 @@ namespace StudioScor.MovementSystem
 
         protected void CheckMoving()
         {
-            if (isMoving && PrevSpeed == 0)
+            if (isMoving && PrevSpeed <= 0f)
             {
                 isMoving = false;
 
                 OnFinishMovement();
                 Callback_OnFinishdMovement();
             }
-            else if (!isMoving && PrevSpeed > 0)
+            else if (!isMoving && PrevSpeed > 0f)
             {
                 isMoving = true;
 
