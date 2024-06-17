@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace StudioScor.MovementSystem
 {
+
     [Serializable]
     public class ReachMovementActionTask : Task, ISubTask
     {

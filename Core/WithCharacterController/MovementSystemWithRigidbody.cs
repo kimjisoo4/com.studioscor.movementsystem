@@ -30,6 +30,7 @@ namespace StudioScor.MovementSystem
         }
         public override void Teleport(Vector3 position)
         {
+            transform.position = position;
             _rigidbody.position = position;
         }
 
