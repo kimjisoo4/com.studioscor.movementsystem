@@ -3,7 +3,7 @@ using StudioScor.Utilities;
 namespace StudioScor.MovementSystem
 {
     [AddComponentMenu("StudioScor/MovementSystem/Modifiers/RootMotion Modifier", order: 30)]
-    public class RootMotionModifier : MovementModifierComponent
+    public class RootMotionModifierComponent : MovementModifierComponent
     {
         [Header(" [ Root Motion Modifier ] ")]
         [SerializeField] private Animator _Animator;

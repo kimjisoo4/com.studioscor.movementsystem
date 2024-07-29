@@ -35,11 +35,11 @@ namespace StudioScor.MovementSystem
 
         protected override void OnMovement(float deltaTime)
         {
-            _LastVelocity = addVelocity;
+            _LastVelocity = _addVelocity;
 
-            if(addPosition != default)
+            if(_addPosition != default)
             {
-                _LastVelocity += addPosition.SafeDivide(deltaTime);
+                _LastVelocity += _addPosition.SafeDivide(deltaTime);
             }
 
             _CharacterController.Move(_LastVelocity * deltaTime);
@@ -59,10 +59,19 @@ namespace StudioScor.MovementSystem
             _CharacterController.enabled = true;
         }
 
-        public override void Teleport(Vector3 position)
+        public override void Teleport(Vector3 position = default, bool isImmediately = true)
         {
-            _TeleporPositiont = position;
-            _WasTeleport = true;
+            if(isImmediately)
+            {
+                _CharacterController.enabled = false;
+                _CharacterController.transform.position = position;
+                _CharacterController.enabled = true;
+            }
+            else
+            {
+                _TeleporPositiont = position;
+                _WasTeleport = true;
+            }
         }
     }
 

@@ -8,19 +8,19 @@ namespace StudioScor.MovementSystem
     public abstract class MovementModifierComponent : BaseMonoBehaviour, IMovementModifier
     {
         [Header(" [ Modifier ] ")]
-        [SerializeField] private GameObject _Owner;
-        [SerializeField] protected EMovementUpdateType _UpdateType = EMovementUpdateType.Default;
-        public GameObject Owner => _Owner;
+        [SerializeField] private GameObject _owner;
+        [SerializeField] protected EMovementUpdateType _updateType = EMovementUpdateType.Default;
+        public GameObject Owner => _owner;
 
-        private bool isPlaying = false;
+        private bool _isPlaying = false;
 
-        private IMovementSystem _MovementSystem;
-        private IMovementModuleSystem _MovementModuleSystem;
+        private IMovementSystem _movementSystem;
+        private IMovementModuleSystem _movementModuleSystem;
 
-        protected IMovementSystem MovementSystem => _MovementSystem;
-        protected IMovementModuleSystem MovementModuleSystem => _MovementModuleSystem;
-        public EMovementUpdateType UpdateType => _UpdateType;
-        public bool IsPlaying => isPlaying;
+        protected IMovementSystem MovementSystem => _movementSystem;
+        protected IMovementModuleSystem MovementModuleSystem => _movementModuleSystem;
+        public EMovementUpdateType UpdateType => _updateType;
+        public bool IsPlaying => _isPlaying;
 
         protected virtual void Reset()
         {
@@ -28,31 +28,31 @@ namespace StudioScor.MovementSystem
             {
                 var component = moduleSystem as Component;
 
-                _Owner = component.gameObject;
+                _owner = component.gameObject;
             }
         }
 
         protected virtual void Awake()
         {
-            _MovementModuleSystem = _Owner.GetMovementModuleSystem();
-            _MovementSystem = _Owner.GetMovementSystem();
+            _movementModuleSystem = _owner.GetMovementModuleSystem();
+            _movementSystem = _owner.GetMovementSystem();
 
-            if (_MovementModuleSystem is null)
+            if (_movementModuleSystem is null)
             {
                 LogError(" Movement System is NULL");
 
                 return;
             }
 
-            _MovementModuleSystem.AddModifier(this);
+            _movementModuleSystem.AddModifier(this);
         }
 
         private void OnDestroy()
         {
-            if (_MovementModuleSystem is null)
+            if (_movementModuleSystem is null)
                 return;
 
-            _MovementModuleSystem.RemoveModifier(this);
+            _movementModuleSystem.RemoveModifier(this);
         }
 
         private void OnEnable()
@@ -68,18 +68,18 @@ namespace StudioScor.MovementSystem
         {
             ResetModifier();
 
-            isPlaying = true;
+            _isPlaying = true;
         }
         public virtual void DisableModifier()
         {
             ResetModifier();
 
-            isPlaying = false;
+            _isPlaying = false;
         }
 
         public void ProcessMovement(float deltaTime)
         {
-            if (!isPlaying)
+            if (!_isPlaying)
                 return;
 
             UpdateMovement(deltaTime);

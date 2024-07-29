@@ -19,7 +19,7 @@ namespace StudioScor.MovementSystem
         [Header(" [ Modifiers ] ")]
         [SerializeField] private DirectionalAccelerationModifierComponent _DirectionalModifier;
         [SerializeField] private GravityModifierComponent _GravityModifier;
-        [SerializeField] private ForceModifier _ForceModifier;
+        [SerializeField] private ForceModifierComponent _ForceModifier;
 
         private void Reset()
         {
@@ -100,17 +100,9 @@ namespace StudioScor.MovementSystem
             _ForceModifier.SetDrag(newDrag);
         }
 
-        public void AddForce(Vector3 addForce, bool useOverride = false)
+        public void AddForce(Vector3 addForce, Vector3 overrideAxis = default)
         {
-            if(useOverride)
-                _ForceModifier.OverrideForce(addForce);
-            else
-                _ForceModifier.AddForce(addForce);
-
-            if (_ForceModifier.Force.y > 0f)
-            {
-                _MovementSystem.ForceUnGrounded();
-            }
+            _ForceModifier.AddForce(addForce, overrideAxis);
         }
 
         private void Update()
