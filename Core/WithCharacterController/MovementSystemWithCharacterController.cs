@@ -42,7 +42,8 @@ namespace StudioScor.MovementSystem
                 _LastVelocity += _addPosition.SafeDivide(deltaTime);
             }
 
-            _CharacterController.Move(_LastVelocity * deltaTime);
+            if(_CharacterController.gameObject.activeSelf)
+                _CharacterController.Move(_LastVelocity * deltaTime);
 
             if (_WasTeleport)
             {

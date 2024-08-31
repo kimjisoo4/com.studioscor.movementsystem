@@ -25,6 +25,8 @@ namespace StudioScor.MovementSystem
         public bool IsMoving { get; }
 
         public float GroundDistance { get; }
+        public Vector3 GroundNormal { get; }
+        public Vector3 GroundPoint { get;  }
 
         public Vector3 PrevVelocity { get; }
         public Vector3 PrevVelocityXZ { get; }
