@@ -70,7 +70,6 @@ namespace StudioScor.MovementSystem
             }
             else
             {
-                _TeleporPositiont = position;
                 _WasTeleport = true;
             }
         }

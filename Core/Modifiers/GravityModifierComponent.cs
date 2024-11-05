@@ -35,7 +35,7 @@ namespace StudioScor.MovementSystem
     public class GravityModifier : MovementModifier, IGravityModifier
     {
         [Header(" [ Gravity Movement ] ")]
-        [SerializeField] private float _Gravity = 9.81f;
+        [SerializeField] private float _gravity = 9.81f;
 
         public GravityModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem, EMovementUpdateType updateType = EMovementUpdateType.Default) : base(movementSystem, moduleSystem, updateType)
         {
@@ -43,7 +43,7 @@ namespace StudioScor.MovementSystem
 
         public void SetGravity(float newGravity)
         {
-            _Gravity = newGravity;
+            _gravity = newGravity;
         }
 
         protected override void UpdateMovement(float deltaTime)
@@ -56,7 +56,7 @@ namespace StudioScor.MovementSystem
             if (gravity.IsPositive())
                 gravity = 0f;
 
-            gravity -= _Gravity * deltaTime;
+            gravity -= _gravity * deltaTime;
 
             MovementSystem.AddVelocity(Vector3.up * gravity);
         }

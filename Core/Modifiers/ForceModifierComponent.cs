@@ -23,13 +23,12 @@ namespace StudioScor.MovementSystem
     public class ForceModifier : MovementModifier, IForceModifier
     {
         [Header(" [ Decelerate Modifier ] ")]
-        [SerializeField, Min(0f)] private float _mass = 1f;
+        [SerializeField, Min(1f)] private float _mass = 1f;
         [SerializeField] private float _drag = 1f;
 
         private Vector3 _force;
         private bool _hasRemainForce;
         private bool _wasPrevAddForce;
-
 
         public float Mass => _mass;
         public float Drag => _drag;
@@ -44,7 +43,7 @@ namespace StudioScor.MovementSystem
         }
         public void SetMass(float newMass)
         {
-            _mass = Mathf.Max(0f, newMass);
+            _mass = Mathf.Max(1f, newMass);
         }
         public void SetDrag(float newDrag)
         {
@@ -56,7 +55,7 @@ namespace StudioScor.MovementSystem
             _hasRemainForce = true;
             _wasPrevAddForce = true;
 
-            Vector3 velocity = addForce /= Mathf.Max(0.001f, _mass);
+            Vector3 velocity = addForce /= Mathf.Max(1f, _mass);
 
             if (overrideAxis.SafeEquals(Vector3.zero))
             {

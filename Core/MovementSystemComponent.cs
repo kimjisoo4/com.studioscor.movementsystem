@@ -306,7 +306,7 @@ namespace StudioScor.MovementSystem
             Vector3 velocity = LastVelocity;
 
             _prevVelocity = velocity;
-            _prevGravity = IsGrounded? 0f : velocity.y;
+            _prevGravity = IsGrounded ? 0f : velocity.y;
 
             velocity.y = 0;
 

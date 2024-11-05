@@ -72,7 +72,7 @@ namespace StudioScor.MovementSystem
                     _lastVelocity += _addPosition.SafeDivide(deltaTime);
                 }
 
-                _rigidbody.velocity = LastVelocity;
+                _rigidbody.linearVelocity = LastVelocity;
             }
 
             if (_wasRequestTeleport)
