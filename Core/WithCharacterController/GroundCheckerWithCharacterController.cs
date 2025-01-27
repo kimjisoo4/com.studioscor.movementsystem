@@ -73,20 +73,20 @@ namespace StudioScor.MovementSystem
 
             if (isHit)
             {
-                _Normal = hit.normal;
-                _Distance = hit.distance - distance;
-                _Point = hit.point;
+                _normal = hit.normal;
+                _distance = hit.distance - distance;
+                _point = hit.point;
 
-                if (_Distance < 0.01f)
+                if (_distance < 0.01f)
                 {
-                    _Distance = 0f;
+                    _distance = 0f;
                 }
             }
             else
             {
-                _Normal = Vector3.up;
-                _Distance = default;
-                _Point = default;
+                _normal = Vector3.up;
+                _distance = default;
+                _point = default;
             }
 
             SetGrounded(isHit);

@@ -12,6 +12,13 @@ namespace StudioScor.MovementSystem
     {
         private StairModifier _modifier;
 
+        protected override void Reset()
+        {
+            base.Reset();
+
+            _updateType = EMovementUpdateType.Late;
+        }
+
         protected override void UpdateMovement(float deltaTime)
         {
             _modifier.ProcessMovement(deltaTime);
@@ -20,23 +27,25 @@ namespace StudioScor.MovementSystem
 
     public class StairModifier : MovementModifier, IStairModifier
     {
-        private bool _WasGrounded = false;
-        private Transform transform => MovementSystem.transform;
-        public StairModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem) : base(movementSystem, moduleSystem)
+        private bool _wasGrounded = false;
+
+        public StairModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem, EMovementUpdateType updateType = EMovementUpdateType.Late) : base(movementSystem, moduleSystem, updateType)
         {
         }
 
+        private Transform transform => MovementSystem.transform;
+        
 
         protected override void UpdateMovement(float deltaTime)
         {
-            if (MovementSystem.IsGrounded && _WasGrounded)
+            if (MovementSystem.IsGrounded && _wasGrounded)
             {
-                float distance = MovementSystem.GroundDistance * -1;
+                float distance = -MovementSystem.GroundDistance;
 
                 MovementSystem.MovePosition(transform.up * distance);
             }
 
-            _WasGrounded = MovementSystem.IsGrounded;
+            _wasGrounded = MovementSystem.IsGrounded;
         }
     }
 

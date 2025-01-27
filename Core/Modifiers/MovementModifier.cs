@@ -7,14 +7,14 @@ namespace StudioScor.MovementSystem
     public abstract class MovementModifier : BaseClass, IMovementModifier
     {
         [Header(" [ Movement Modifier ] ")]
-        private EMovementUpdateType _updateType = EMovementUpdateType.Default;
+        protected EMovementUpdateType _updateType = EMovementUpdateType.Default;
         private IMovementSystem _movementSystem;
         private IMovementModuleSystem _moduleSystem;
 
         private bool _isPlaying = false;
-        public EMovementUpdateType UpdateType => _updateType;
-        public bool IsPlaying => _isPlaying;
         
+        public bool IsPlaying => _isPlaying;
+        public EMovementUpdateType UpdateType => _updateType;
         public IMovementSystem MovementSystem => _movementSystem;
         public IMovementModuleSystem ModuleSystem => _moduleSystem;
 

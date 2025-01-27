@@ -25,18 +25,18 @@ namespace StudioScor.MovementSystem
     public abstract class GroundChecker : BaseMonoBehaviour, IGroundChecker
     {
         [Header(" [ Ground Checker ] ")]
-        protected Vector3 _Normal;
-        protected Vector3 _Point;
-        protected float _Distance;
-        protected bool _IsGrounded;
-        protected bool _WasGrounded;
+        protected Vector3 _normal;
+        protected Vector3 _point;
+        protected float _distance;
+        protected bool _isGrounded;
+        protected bool _wasGrounded;
 
 
-        public bool IsGrounded => _IsGrounded;
-        public bool WasGrounded => _WasGrounded;
-        public Vector3 Normal => _Normal;
-        public Vector3 Point => _Point;
-        public float Distance => _Distance;
+        public bool IsGrounded => _isGrounded;
+        public bool WasGrounded => _wasGrounded;
+        public Vector3 Normal => _normal;
+        public Vector3 Point => _point;
+        public float Distance => _distance;
 
         public event IGroundChecker.ChangedGroundedStateHandler OnChangedGroundedState;
 
@@ -50,10 +50,10 @@ namespace StudioScor.MovementSystem
 
         public void SetGrounded(bool isGrounded)
         {
-            _WasGrounded = _IsGrounded;
-            _IsGrounded = isGrounded;
+            _wasGrounded = _isGrounded;
+            _isGrounded = isGrounded;
 
-            if (_IsGrounded == _WasGrounded)
+            if (_isGrounded == _wasGrounded)
                 return;
 
             Callback_OnChangedGroundedState();
@@ -63,9 +63,9 @@ namespace StudioScor.MovementSystem
 
         protected void Callback_OnChangedGroundedState()
         {
-            Log("On Changed Grounded State - " + _IsGrounded);
+            Log("On Changed Grounded State - " + _isGrounded);
 
-            OnChangedGroundedState?.Invoke(this, _IsGrounded);
+            OnChangedGroundedState?.Invoke(this, _isGrounded);
         }
     }
 

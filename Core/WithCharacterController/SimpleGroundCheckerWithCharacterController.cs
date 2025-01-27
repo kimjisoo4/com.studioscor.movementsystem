@@ -36,15 +36,15 @@ namespace StudioScor.MovementSystem
 
             if (ground)
             {
-                _Normal = Vector3.up;
-                _Distance = 0f;
-                _Point = _CharacterController.transform.position;
+                _normal = Vector3.up;
+                _distance = 0f;
+                _point = _CharacterController.transform.position;
             }
             else
             {
-                _Normal = Vector3.up;
-                _Distance = default;
-                _Point = default;
+                _normal = Vector3.up;
+                _distance = default;
+                _point = default;
             }
 
             SetGrounded(ground);

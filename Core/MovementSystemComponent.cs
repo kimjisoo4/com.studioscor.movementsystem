@@ -210,7 +210,7 @@ namespace StudioScor.MovementSystem
             if (!prevGrounded)
             {
                 OnLand();
-                Callback_OnLanded();
+                Invoke_OnLanded();
             }
         }
         public void ForceUnGrounded()
@@ -225,26 +225,26 @@ namespace StudioScor.MovementSystem
             if (prevGrounded)
             {
                 OnJump();
-                Callback_OnJumped();
+                Invoke_OnJumped();
             }
         }
         public void SetGrounded(bool isGrounded)
         {
-            _wasGrounded = this._isGrounded;
-            this._isGrounded = isGrounded;
+            _wasGrounded = _isGrounded;
+            _isGrounded = isGrounded;
 
-            if (_wasGrounded == this._isGrounded)
+            if (_wasGrounded == _isGrounded)
                 return;
 
             if (IsGrounded)
             {
                 OnLand();
-                Callback_OnLanded();
+                Invoke_OnLanded();
             }
             else
             {
                 OnJump();
-                Callback_OnJumped();
+                Invoke_OnJumped();
             }
         }
         public void SetGroundState(Vector3 point, Vector3 normal, float distance)
@@ -332,13 +332,13 @@ namespace StudioScor.MovementSystem
         }
 
         #region CallBack
-        protected void Callback_OnLanded()
+        protected void Invoke_OnLanded()
         {
             Log("On Landed");
 
             OnLanded?.Invoke(this);
         }
-        protected void Callback_OnJumped()
+        protected void Invoke_OnJumped()
         {
             Log("On Jumped");
 

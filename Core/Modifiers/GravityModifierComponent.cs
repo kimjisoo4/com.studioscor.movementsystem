@@ -37,7 +37,7 @@ namespace StudioScor.MovementSystem
         [Header(" [ Gravity Movement ] ")]
         [SerializeField] private float _gravity = 9.81f;
 
-        public GravityModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem, EMovementUpdateType updateType = EMovementUpdateType.Default) : base(movementSystem, moduleSystem, updateType)
+        public GravityModifier(IMovementSystem movementSystem, IMovementModuleSystem moduleSystem, EMovementUpdateType updateType = EMovementUpdateType.Late) : base(movementSystem, moduleSystem, updateType)
         {
         }
 
